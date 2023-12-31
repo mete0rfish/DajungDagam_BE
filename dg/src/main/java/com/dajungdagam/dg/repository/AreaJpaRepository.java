@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AreaJpaRepository  extends JpaRepository<Area, Integer> {
-
+    Area findByGuNameAndDongName(String guName, String dongName);
 }

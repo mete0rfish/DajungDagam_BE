@@ -143,11 +143,13 @@ public class kakaoApi {
             str = kakaoAccount.toString();
             System.out.println(str);
 
-            String nickname = properties.getAsJsonObject().get("nickname").getAsString();
+            String kakaoName = properties.getAsJsonObject().get("nickname").getAsString();
             //String email = kakaoAccount.getAsJsonObject().get("email").getAsString();
 
-            userInfo.put("nickname", nickname);
+            userInfo.put("kakaoName", kakaoName);
             //userInfo.put("email", email);
+
+            System.out.println((String)userInfo.get("kakaoName"));
 
             br.close();
 

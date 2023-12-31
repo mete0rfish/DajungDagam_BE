@@ -8,7 +8,8 @@
 </head>
 <body>
     <div class="text-center">
-        <a href="https://kauth.kakao.com/oauth/authorize?client_id=068eacfa29b89a11407243e6899cc157&redirect_uri=http://localhost:8080/login/oauth2/code/kakao&response_type=code">Login</a>
+        <a href="https://kauth.kakao.com/oauth/authorize?client_id=068eacfa29b89a11407243e6899cc157&redirect_uri=http://localhost:3000/oauth/callback/kakao&response_type=code">3000 Login</a>
+        <a href="https://kauth.kakao.com/oauth/authorize?client_id=068eacfa29b89a11407243e6899cc157&redirect_uri=http://localhost:8080/login/oauth2/code/kakao&response_type=code">8080 Login</a>
     </div>
 </body>
 </html>

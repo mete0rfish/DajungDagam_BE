@@ -1,5 +1,6 @@
 package com.dajungdagam.dg.domain.dto;
 
+import com.dajungdagam.dg.domain.User;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,12 +13,12 @@ import org.springframework.http.HttpStatus;
 public class UserKakaoLoginResponseDto {
 
     private HttpStatus httpStatus;
-    private String accessToken;
-    private String nickName;
+    private String jwtToken;
+    private User user;
 
-    public UserKakaoLoginResponseDto(HttpStatus httpStatus, String accessToken, String nickName) {
+    public UserKakaoLoginResponseDto(HttpStatus httpStatus, String accessToken, User user) {
         this.httpStatus = httpStatus;
-        this.accessToken = accessToken;
-        this.nickName = nickName;
+        this.jwtToken = accessToken;
+        this.user = user;
     }
 }

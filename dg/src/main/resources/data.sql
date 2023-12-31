@@ -1,4 +1,4 @@
-insert into areas(area_id, gu_name, dong_name)
+insert into areas(area_id, guName, dongName)
 values
     (1, '강남구', '신사동'),
     (2, '강남구', '논현제1동'),

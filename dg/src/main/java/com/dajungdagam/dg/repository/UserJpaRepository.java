@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface UserJpaRepository extends JpaRepository<User, Integer> {
 
     User findByNickName(String nickName);
+    User findByKakaoName(String kakaoName);
 }

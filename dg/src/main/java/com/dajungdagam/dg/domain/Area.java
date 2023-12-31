@@ -12,8 +12,8 @@ public class Area {
     @Id
     @Column(name = "area_id")
     private int id;
-    @Column
-    private String gu_name;
-    @Column
-    private String dong_name;
+    @Column(name = "GUNAME")
+    private String guName;
+    @Column(name = "DONGNAME")
+    private String dongName;
 }
