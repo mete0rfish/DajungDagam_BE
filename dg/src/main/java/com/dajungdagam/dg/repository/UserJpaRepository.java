@@ -1,7 +1,6 @@
 package com.dajungdagam.dg.repository;
 
-import com.dajungdagam.dg.domain.Area;
-import com.dajungdagam.dg.domain.User;
+import com.dajungdagam.dg.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

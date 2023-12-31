@@ -6,26 +6,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.SecurityConfig;
-
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @Configuration
 @EnableWebSecurity
@@ -37,7 +27,7 @@ public class SecurityConfiguration {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private final List<String> allowedUris = new ArrayList<>(Arrays.asList("/h2-console/**", "/login/**"));
+    private final List<String> allowedUris = new ArrayList<>(Arrays.asList("/h2-console/**", "/log/**"));
 
     // h2-console 사용하기 위해 보안 허용
     /*@Bean
@@ -73,6 +63,7 @@ public class SecurityConfiguration {
                 .authorizeRequests()
                 .requestMatchers("/login/**").permitAll() // login은 전체 허용
                 .requestMatchers("/h2-console/**").permitAll() // h2-console은 전체 허용
+                .requestMatchers("/trade/**").permitAll() // h2-console은 전체 허용
                 .requestMatchers(HttpMethod.POST, "/mypage/**").authenticated() // mypage는 인증하도록 설정
                 .and()
                 .sessionManagement()

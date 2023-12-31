@@ -1,4 +1,4 @@
-package com.dajungdagam.dg.domain;
+package com.dajungdagam.dg.domain.entity;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;

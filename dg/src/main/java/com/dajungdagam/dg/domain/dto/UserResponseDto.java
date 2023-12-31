@@ -1,6 +1,6 @@
 package com.dajungdagam.dg.domain.dto;
 
-import com.dajungdagam.dg.domain.User;
+import com.dajungdagam.dg.domain.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,11 +1,11 @@
-package com.dajungdagam.dg.domain;
+package com.dajungdagam.dg.domain.entity;
 
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-public class TradePost {
+public class GbPost {
     @Id
     @GeneratedValue
     @Column(name = "post_id")
@@ -50,4 +50,13 @@ public class TradePost {
     @Enumerated(EnumType.STRING)
     @Column(name = "trade_status")
     private TradeStatus tradeStatus;
+
+    @Column(name = "person_count")
+    private int personCount;            //모집인원
+
+    @Column(name = "person_current_count")
+    private int personCurrentCount;     //현재 모집된 인원
+
+    @Column(name = "deadline")
+    private LocalDateTime deadline;
 }
