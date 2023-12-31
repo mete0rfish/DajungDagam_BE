@@ -1,8 +1,7 @@
 package com.dajungdagam.dg.domain.dto;
 
-import com.dajungdagam.dg.domain.User;
+import com.dajungdagam.dg.domain.entity.User;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.http.HttpStatus;
 

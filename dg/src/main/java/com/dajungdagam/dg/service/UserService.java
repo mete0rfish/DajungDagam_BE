@@ -1,14 +1,13 @@
 package com.dajungdagam.dg.service;
 
-import com.dajungdagam.dg.domain.Area;
-import com.dajungdagam.dg.domain.RoleType;
-import com.dajungdagam.dg.domain.User;
+import com.dajungdagam.dg.domain.entity.Area;
+import com.dajungdagam.dg.domain.entity.RoleType;
+import com.dajungdagam.dg.domain.entity.User;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.jwt.jwtTokenProvider;
 import com.dajungdagam.dg.repository.AreaJpaRepository;
 import com.dajungdagam.dg.repository.UserJpaRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
-import java.util.List;
 import java.util.Map;
 
 @Service

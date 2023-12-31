@@ -1,13 +1,11 @@
-package com.dajungdagam.dg.domain;
+package com.dajungdagam.dg.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 
 @Entity
 @Table
