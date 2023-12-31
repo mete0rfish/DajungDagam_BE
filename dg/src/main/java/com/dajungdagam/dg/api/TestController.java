@@ -84,17 +84,17 @@ public class TestController {
         return new ResponseEntity<>(userKakaoLoginResponseDto, headers, userKakaoLoginResponseDto.getHttpStatus());
     }
 
-    @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    private ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
-        Cookie[] cookies = request.getCookies();
-        boolean isValidJsessionid = false;
-
-        if(cookies != null && session != null){
-            Optional<Cookie> jsessionCookie = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals(""))
-        }
-
-    }
+//    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+//    private ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        HttpSession session = request.getSession(false);
+//        Cookie[] cookies = request.getCookies();
+//        boolean isValidJsessionid = false;
+//
+//        if(cookies != null && session != null){
+//            Optional<Cookie> jsessionCookie = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals(""))
+//        }
+//
+//    }
 
     @PostMapping("/login/details/v1")
     public ResponseEntity<String> loginDetailsNickName(@RequestParam String kakaoName, @RequestParam String nickName){
