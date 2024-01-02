@@ -1,7 +1,9 @@
 package com.dajungdagam.dg.service;
 
 import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.entity.TradePost;
+import com.dajungdagam.dg.domain.entity.User;
 import com.dajungdagam.dg.repository.TradePostRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -107,4 +109,7 @@ public class TradePostService {
     public void deletePost(Long id) {
         tradePostRepository.deleteById(id);
     }
+
+
+
 }

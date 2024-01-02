@@ -40,12 +40,17 @@ public class MypageController {
     @PostMapping("/mypage/{user_id}/posts")
     public ResponseEntity<List> getWrittenPosts(Authentication authentication, @PathVariable("user_id") int user_id) {
         List<TradePostDto> tradePostDtoList = null;
-        //try{
-            //if(authentication == null)
-                //throw new Exception("authentication is null");
+        try{
+            if(authentication == null)
+                throw new Exception("authentication is null");
 
             String kakaoName = authentication.getName();
             UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+
+            //kakaoName으로 찾은 유저의 id와 pathVariable로 받은 id가 같은지 검증
+            if(!userService.isSameUser(user_id, userResponseDto)){
+                throw new Exception("user is not same");
+            }
 
             // kakao Name으로 받아오기
             tradePostDtoList = tradePostService.searchPostsByUserId(user_id);
@@ -56,9 +61,9 @@ public class MypageController {
 
             return new ResponseEntity<>(tradePostDtoList, headers, HttpStatus.OK);
 
-//        } catch(Exception e){
-//            return ResponseEntity.badRequest().build();
-//        }
+        } catch(Exception e){
+            return ResponseEntity.badRequest().build();
+        }
 
 
     }

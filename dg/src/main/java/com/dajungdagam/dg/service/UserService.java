@@ -132,6 +132,9 @@ public class UserService {
         return id;
     }
 
-
+    public boolean isSameUser(int userId, UserResponseDto userResponseDto){
+        User user = userResponseDto.getUser();
+        return user.getId() == userId;
+    }
 
 }

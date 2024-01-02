@@ -36,7 +36,7 @@ public class TradePostController {
 
     @GetMapping("/trade/posts")
     public String saveForm() {
-        return "save.jsp";
+        return "save.html";
     }
 
 //	@GetMapping("/trade/like-posts")
