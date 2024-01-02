@@ -20,7 +20,7 @@ public class TradePostDto {
     private String content;
     private LocalDateTime createdTime;
     private LocalDateTime updateTime;
-    private Long viewCount;
+    private int viewCount;
     private Long wishlistCount;
     private String chatLink;
     private TradeStatus tradeStatus;
@@ -46,7 +46,7 @@ public class TradePostDto {
     @Builder
     public TradePostDto(Long id, User user, Area area, String title, PostType postType,
                         String tradeArea, String content, LocalDateTime createdTime,
-                        LocalDateTime updateTime, Long viewCount, Long wishlistCount,
+                        LocalDateTime updateTime, int viewCount, Long wishlistCount,
                         String chatLink, TradeStatus tradeStatus)
     {
         this.id = id;
@@ -63,5 +63,6 @@ public class TradePostDto {
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
     }
+
 
 }

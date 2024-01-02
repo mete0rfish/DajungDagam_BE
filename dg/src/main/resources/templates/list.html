@@ -26,6 +26,7 @@
             <th class="one wide">번호</th>
             <th class="ten wide">글제목</th>
             <th class="three wide">작성일</th>
+            <th class="one wide">조회수</th>
         </tr>
         </thead>
 
@@ -40,7 +41,10 @@
                 </a>
             </td>
             <td>
-                <span th:text="${#temporals.format(board.createdTime    , 'yyyy-MM-dd HH:mm')}"></span>
+                <span th:text="${#temporals.format(board.createdTime, 'yyyy-MM-dd HH:mm')}"></span>
+            </td>
+            <td>
+                <span th:text="${board.viewCount}"></span>
             </td>
         </tr>
         </tbody>
@@ -48,7 +52,7 @@
 
     <div>
     <span th:each="pageNum : ${pageList}" th:inline="text">
-        <a th:href="@{'/?page=' + ${pageNum}}">[[${pageNum}]]</a>
+        <a th:href="@{'/trade/?page=' + ${pageNum}}">[[${pageNum}]]</a>
     </span>
     </div>
 </div>

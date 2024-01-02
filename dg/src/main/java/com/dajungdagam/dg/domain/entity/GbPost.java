@@ -39,7 +39,7 @@ public class GbPost {
     private LocalDateTime updateTime;
 
     @Column(name = "view_count")
-    private ViewCount viewCount;
+    private Long viewCount;
 
     @Column(name = "wishlist_count")
     private WishListCount wishlistCount;

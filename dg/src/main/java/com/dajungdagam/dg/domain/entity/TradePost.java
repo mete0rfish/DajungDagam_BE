@@ -1,15 +1,20 @@
 package com.dajungdagam.dg.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
 @Entity
+@DynamicUpdate
+@DynamicInsert
 public class TradePost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,8 +48,8 @@ public class TradePost extends BaseEntity {
     @Column(columnDefinition = "TIMESTAMP", name = "update_time")
     private LocalDateTime updateTime;
 
-    @Column(columnDefinition = "BIGINT", name = "view_count")
-    private Long viewCount;
+    @Column(columnDefinition = "integer default 0", name = "view_count")
+    private int viewCount;
 
     @Column(columnDefinition = "BIGINT", name = "wishlist_count")
     private Long wishlistCount;
@@ -59,7 +64,7 @@ public class TradePost extends BaseEntity {
     @Builder
     public TradePost(Long id, User user, Area area, String title, PostType postType,
                      String tradeArea, String content, LocalDateTime createdTime,
-                     LocalDateTime updateTime, Long viewCount, Long wishlistCount,
+                     LocalDateTime updateTime, int viewCount, Long wishlistCount,
                      String chatLink, TradeStatus tradeStatus) {
         this.id = id;
         this.user = user;
@@ -75,4 +80,5 @@ public class TradePost extends BaseEntity {
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
     }
+
 }

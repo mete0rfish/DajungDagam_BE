@@ -1,7 +1,8 @@
-package com.dajungdagam.dg.controller;
+package com.dajungdagam.dg.Controller;
 
 
 import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.entity.TradePost;
 import com.dajungdagam.dg.service.TradePostService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -21,9 +22,12 @@ public class TradePostController {
     }
 
     @GetMapping("/trade/")
-    public String list(Model model) {
-        List<TradePostDto> tradePostDtoList = tradePostService.getPostlist();
+    public String list(Model model, @RequestParam(value = "page", defaultValue = "1") Integer pageNum) {
+        List<TradePostDto> tradePostDtoList = tradePostService.getPostlist(pageNum);
+        Integer[] pageList = tradePostService.getPageList(pageNum);
+
         model.addAttribute("TradePostList", tradePostDtoList);
+        model.addAttribute("pageList", pageList);
         return "list";
     }
 
@@ -45,9 +49,12 @@ public class TradePostController {
 
     @GetMapping("/trade/posts/{id}")
     public String detail(@PathVariable Long id, Model model) {
+        tradePostService.updateView(id);
+
         TradePostDto tradePostDto = tradePostService.getPost(id);
 
         model.addAttribute("tradepostDto", tradePostDto);
+
         return "detail";
     }
 
