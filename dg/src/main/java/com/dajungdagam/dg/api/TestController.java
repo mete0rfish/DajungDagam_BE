@@ -2,8 +2,10 @@ package com.dajungdagam.dg.api;
 
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
 import com.dajungdagam.dg.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
@@ -38,7 +41,7 @@ public class TestController {
     // 카카오 로그인으로 nick 및 jwtToken 저장
     @ResponseBody
     @RequestMapping("/login/oauth2/code/kakao")
-    public ResponseEntity<?> kakaoLogin(@RequestParam String code) {
+    public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpSession session) {
         // 1. 인가 코드 받기
         log.info("eeeee");
 
@@ -60,11 +63,13 @@ public class TestController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-
-        // ~~ 확인용 ~~
         //String email = (String)userInfo.get("email");
         String kakaoName = userKakaoLoginResponseDto.getUser().getKakaoName();
         String jwtToken = userKakaoLoginResponseDto.getJwtToken();
+
+        // 6. 세션에 access Token 저장
+        session.setAttribute("accessToken", accessToken);
+        session.setAttribute("jwtToken", jwtToken);
 
         //System.out.println("email = " + email);
         log.info("kakaoName: " + kakaoName);
@@ -73,17 +78,12 @@ public class TestController {
         return new ResponseEntity<>(userKakaoLoginResponseDto, headers, userKakaoLoginResponseDto.getHttpStatus());
     }
 
-//    @RequestMapping(value = "/logout", method = RequestMethod.GET)
-//    private ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        HttpSession session = request.getSession(false);
-//        Cookie[] cookies = request.getCookies();
-//        boolean isValidJsessionid = false;
-//
-//        if(cookies != null && session != null){
-//            Optional<Cookie> jsessionCookie = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals(""))
-//        }
-//
-//    }
+    @RequestMapping(value = "/login/logout")
+    private ResponseEntity<String> logout(HttpSession session) throws IOException {
+        String accessToken = session.getAttribute("accessToken").toString();
+        kakaoApi.kakaoLogout(accessToken);
+        return ResponseEntity.ok("logouted!");
+    }
 
     @PostMapping("/login/details/v1")
     public ResponseEntity<String> loginDetailsNickName(@RequestParam String kakaoName, @RequestParam String nickName) {

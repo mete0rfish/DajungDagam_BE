@@ -18,7 +18,7 @@ public class TradePost extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private User user;
 
     @OneToOne(fetch = FetchType.LAZY)

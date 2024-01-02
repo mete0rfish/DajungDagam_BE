@@ -2,9 +2,13 @@ package com.dajungdagam.dg.controller;
 
 
 import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.service.TradePostService;
+import com.dajungdagam.dg.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +19,9 @@ import java.util.List;
 public class TradePostController {
 
     private TradePostService tradePostService;
+
+    @Autowired
+    private UserService userService;
 
     public TradePostController(TradePostService tradePostService) {
         this.tradePostService = tradePostService;
@@ -29,7 +36,7 @@ public class TradePostController {
 
     @GetMapping("/trade/posts")
     public String saveForm() {
-        return "save";
+        return "save.jsp";
     }
 
 //	@GetMapping("/trade/like-posts")
@@ -38,8 +45,21 @@ public class TradePostController {
 //	}
 
     @PostMapping("/trade/posts")
-    public String write(TradePostDto tradePostDto) {
-        tradePostService.savePost(tradePostDto);
+    public String write(Authentication authentication, TradePostDto tradePostDto) {
+        try {
+            if(authentication == null)
+                throw new Exception("authentication is null. non user Info");
+
+            String kakaoName = authentication.getName();
+            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+            tradePostDto.setUser(userResponseDto.getUser());
+
+        }catch(Exception e){
+            e.getStackTrace();
+        } finally {
+            tradePostService.savePost(tradePostDto);
+        }
+
         return "redirect:/";
     }
 

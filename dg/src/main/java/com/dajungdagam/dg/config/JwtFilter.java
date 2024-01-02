@@ -44,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("authorization : {}", authorization);
 
         // 토큰 업승면 return
-        if(authorization == null || !authorization.startsWith("bearer ")){
+        if(authorization == null || !authorization.startsWith("Bearer ")){
 
             log.error("authorization 이 잘못 보내짐");
             filterChain.doFilter(request, response);
@@ -69,6 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // 권한 부여
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(kakaoName, null, List.of(new SimpleGrantedAuthority("USER")));
+
         // Detail 넣어주기
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);

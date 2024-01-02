@@ -4,6 +4,7 @@ import com.dajungdagam.dg.domain.dto.TradePostDto;
 import com.dajungdagam.dg.domain.entity.TradePost;
 import com.dajungdagam.dg.repository.TradePostRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class TradePostService {
 
     private TradePostRepository tradePostRepository;
@@ -27,6 +29,23 @@ public class TradePostService {
         if (tradePosts.isEmpty()) return tradePostDtoList;
 
         for (TradePost tradePost : tradePosts) {
+            tradePostDtoList.add(this.convertEntityToDto(tradePost));
+        }
+
+        return tradePostDtoList;
+    }
+
+    @Transactional
+    public List<TradePostDto> searchPostsByUserId(int userId) {
+        List<TradePost> tradePosts = tradePostRepository.findByUserId(userId);
+        List<TradePostDto> tradePostDtoList = new ArrayList<>();
+
+        if(tradePosts.isEmpty()){
+            log.info("tradePosts is Empty");
+            return tradePostDtoList;
+        }
+
+        for(TradePost tradePost : tradePosts){
             tradePostDtoList.add(this.convertEntityToDto(tradePost));
         }
 
