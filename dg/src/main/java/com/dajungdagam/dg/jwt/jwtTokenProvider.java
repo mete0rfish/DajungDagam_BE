@@ -31,6 +31,5 @@ public class jwtTokenProvider {
                 .setExpiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
-
     }
 }

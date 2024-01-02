@@ -32,13 +32,5 @@ public class MypageController {
         return ResponseEntity.ok().body(authentication.getName() + "님의 마이페이지 입니다.");
     }
 
-    // JWT Token 복호화 테스트
-    @GetMapping("/jwt/claims")
-    public ResponseEntity<String> getClaims(@RequestParam String jwtToken) {
-        Jws<Claims> claims = jwtTokenDecoder.getClaims(jwtToken);
-        String kakaoName = claims.getBody().get("kakaoName").toString();
-        log.info("kakao: " + kakaoName);
-        return ResponseEntity.ok(kakaoName);
-    }
 
 }

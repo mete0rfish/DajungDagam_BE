@@ -17,6 +17,7 @@ public class jwtTokenDecoder {
     private static String secretKey;
 
     public static Jws<Claims> getClaims(String jwt){
+        log.info("jwt: "+jwt);
         try{
             return
                     Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwt);

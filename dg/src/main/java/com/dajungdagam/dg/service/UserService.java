@@ -5,9 +5,14 @@ import com.dajungdagam.dg.domain.entity.RoleType;
 import com.dajungdagam.dg.domain.entity.User;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
+import com.dajungdagam.dg.jwt.RefreshToken;
 import com.dajungdagam.dg.jwt.jwtTokenProvider;
 import com.dajungdagam.dg.repository.AreaJpaRepository;
 import com.dajungdagam.dg.repository.UserJpaRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
+import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -125,6 +131,7 @@ public class UserService {
 
         return id;
     }
+
 
 
 }

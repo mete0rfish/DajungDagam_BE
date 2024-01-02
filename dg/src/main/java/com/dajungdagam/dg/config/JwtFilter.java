@@ -44,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("authorization : {}", authorization);
 
         // 토큰 업승면 return
-        if(authorization == null || !authorization.startsWith("Bearer ")){
+        if(authorization == null || !authorization.startsWith("bearer ")){
 
             log.error("authorization 이 잘못 보내짐");
             filterChain.doFilter(request, response);
@@ -64,6 +64,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Username Token에서 꺼내기
         String kakaoName = jwtTokenProvider.getUserName(token, secretKey);
+        System.out.println(" [ kakaoName ] : "+  kakaoName);
 
         // 권한 부여
         UsernamePasswordAuthenticationToken authenticationToken =
