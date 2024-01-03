@@ -57,11 +57,12 @@ public class TradePost extends BaseEntity {
     @Column(name = "trade_status")
     private TradeStatus tradeStatus;
 
+    @ManyToOne
+    @JoinColumn(name = "wish_id")
+    private Wishlist wishlist;
+
     @Builder
-    public TradePost(Long id, User user, Area area, String title, PostType postType,
-                     String tradeArea, String content, LocalDateTime createdTime,
-                     LocalDateTime updateTime, Long viewCount, Long wishlistCount,
-                     String chatLink, TradeStatus tradeStatus) {
+    public TradePost(Long id, User user, Area area, String title, PostType postType, String tradeArea, String content, LocalDateTime createdTime, LocalDateTime updateTime, Long viewCount, Long wishlistCount, String chatLink, TradeStatus tradeStatus) {
         this.id = id;
         this.user = user;
         this.area = area;

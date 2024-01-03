@@ -10,18 +10,16 @@ import java.util.ArrayList;
 @Entity
 @Table
 @Getter
-@Builder
 public class Wishlist {
     @Id
     @GeneratedValue
-    private int id;
+    @Column(name = "wishlist_id")
+    private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name="gbPost_id")
-    private ArrayList<GbPost> gbPost;
+    @Column(unique = true, name = "wish_id")
+    private Long wishId;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name="tradePost_id")
+    @OneToMany(mappedBy = "wishlist")
     private ArrayList<TradePost> tradePost;
 
     @Column
@@ -31,15 +29,16 @@ public class Wishlist {
     @JoinColumn(name="user_id")
     private User user;
 
-    public Wishlist() {
 
-    }
-
-    public Wishlist(int id, ArrayList<GbPost> gbPost, ArrayList<TradePost> tradePost, LocalDateTime createdTime, User user) {
+    @Builder
+    public Wishlist(Long id, ArrayList<TradePost> tradePost, LocalDateTime createdTime, User user) {
         this.id = id;
-        this.gbPost = gbPost;
         this.tradePost = tradePost;
         this.createdTime = createdTime;
         this.user = user;
+    }
+
+    public Wishlist() {
+
     }
 }
