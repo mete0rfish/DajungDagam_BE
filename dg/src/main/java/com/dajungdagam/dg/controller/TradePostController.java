@@ -2,6 +2,7 @@ package com.dajungdagam.dg.controller;
 
 
 import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.dto.TradePostSummaryDto;
 import com.dajungdagam.dg.service.TradePostService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -32,10 +33,12 @@ public class TradePostController {
         return "save";
     }
 
-//	@GetMapping("/trade/like-posts")
-//	public String saveForm2() {
-//		return "save";
-//	}
+    @GetMapping("/trade/like-posts")
+    public TradePostSummaryDto liked_list() {
+
+        //인기글 목록에는 모든 정보가 필요하지 않다. -> TradePostSummaryDto를 이용하여 반환
+        return new TradePostSummaryDto();
+    }
 
     @PostMapping("/trade/posts")
     public String write(TradePostDto tradePostDto) {
