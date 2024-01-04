@@ -1,5 +1,6 @@
 package com.dajungdagam.dg.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,21 +23,27 @@ public class Wishlist {
     private Long id;
 
 
-    @OneToMany(mappedBy = "wishlist", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany
     @Setter
     @Getter
-    private List<TradePost> tradePosts; //= new ArrayList<>();
+    @JsonManagedReference
+    private List<TradePost> tradePosts;
 
     @Column
     private LocalDateTime createdTime;
 
     @OneToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name="user_id")
+
     private User user;
 
 
+    public void addTradePost(TradePost tradePost){
+        tradePosts.add(tradePost);
+    }
+
     @Builder
-    public Wishlist(Long id, ArrayList<TradePost> tradePosts, LocalDateTime createdTime, User user) {
+    public Wishlist(Long id, List<TradePost> tradePosts, LocalDateTime createdTime, User user) {
         this.id = id;
         this.tradePosts = tradePosts;
         this.createdTime = createdTime;

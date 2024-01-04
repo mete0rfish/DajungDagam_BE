@@ -39,15 +39,16 @@ public class WishlistService {
         return wishlist;
     }
 
+    // TODO: 이미 찜목록되어 있으면, 알려야하나?
     @Transactional
     public Wishlist addPostToWishlist(WishlistDto wishlistDto){
         Wishlist wishlist = null;
         try {
-            log.info("wishlist 1 : " + wishlistDto.getKakaoName());
+            //log.info("wishlist 1 : " + wishlistDto.getKakaoName());
             User user = userRepository.findByKakaoName(wishlistDto.getKakaoName());
-            log.info("wishlist 2 : " + user.getKakaoName());
+            //log.info("wishlist 2 : " + user.getKakaoName());
             wishlist = wishlistRepository.findByUser(user);
-            log.info("wish: " + wishlist.toString());
+            //log.info("wish: " + wishlist.toString());
 
             int postCategory = wishlistDto.getPostCategory();
             Long postId = wishlistDto.getPostId();
@@ -64,10 +65,12 @@ public class WishlistService {
                 log.info("TradePost: "+ tradePost.toString());
 
                 if(tradePost == null)    throw new Exception("wishlist is null");
-                wishlist.getTradePosts().add(tradePost);
-                log.info("wishlist의 tradeposts: " + wishlist.getTradePosts().toString());
-                
+
+                wishlist.addTradePost(tradePost);
                 wishlistRepository.save(wishlist);
+
+                log.info("wishlist의 tradeposts: " + wishlist.getTradePosts().toString());
+
             }
         } catch(Exception e){
             log.info(e.getMessage());
@@ -75,6 +78,7 @@ public class WishlistService {
         }
         return wishlist;
     }
+
 
     public Wishlist deletePostAtWishlist(String kakaoName, int postCategory, Long postId) {
         Wishlist wishlist= null;
@@ -94,7 +98,10 @@ public class WishlistService {
 
                 if(tradePost == null)    throw new Exception("wishlist is null");
                 List<TradePost> tradePosts = wishlist.getTradePosts();
-                tradePosts.stream().filter(post  -> Objects.equals(post.getId(), postId))
+                tradePosts.stream().filter(post  -> {
+                    if(Objects.equals(post.getId(), postId)) return true;
+                    else return false;
+                })
                         .toList().forEach(tradePosts::remove);
 
                 wishlistRepository.save(wishlist);

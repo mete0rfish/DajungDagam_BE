@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -15,20 +16,25 @@ public class TradePost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tp_id")
+    @Getter
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
+    @Getter
     private User user;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
+    @Getter
     private Area area;
 
     @Column(length = 50, name = "tp_title")
+    @Getter
     private String title;
 
     @Enumerated(EnumType.STRING)
+    @Getter
     @Column(name = "post_type")
     private PostType postType;
 
@@ -57,11 +63,8 @@ public class TradePost extends BaseEntity {
     @Column(name = "trade_status")
     private TradeStatus tradeStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "wishlist_id")
-    private Wishlist wishlist;
-
     @Builder
+
     public TradePost(Long id, User user, Area area, String title, PostType postType, String tradeArea, String content, LocalDateTime createdTime, LocalDateTime updateTime, Long viewCount, Long wishlistCount, String chatLink, TradeStatus tradeStatus) {
         this.id = id;
         this.user = user;
