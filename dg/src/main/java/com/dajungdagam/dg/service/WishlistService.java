@@ -7,11 +7,15 @@ import com.dajungdagam.dg.domain.entity.Wishlist;
 import com.dajungdagam.dg.repository.TradePostRepository;
 import com.dajungdagam.dg.repository.UserJpaRepository;
 import com.dajungdagam.dg.repository.WishListJpaRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -24,12 +28,27 @@ public class WishlistService {
     @Autowired
     private WishListJpaRepository wishlistRepository;
 
-    public Boolean addPostToWishlist(WishlistDto wishlistDto){
+    public Wishlist addWishlist(String kakaoName){
+        User user = userRepository.findByKakaoName(kakaoName);
+
+        Wishlist wishlist = new Wishlist(user);
+        wishlistRepository.save(wishlist);
+
+        log.info("찜목록 생성됨");
+
+        return wishlist;
+    }
+
+    @Transactional
+    public Wishlist addPostToWishlist(WishlistDto wishlistDto){
+        Wishlist wishlist = null;
         try {
             log.info("wishlist 1 : " + wishlistDto.getKakaoName());
             User user = userRepository.findByKakaoName(wishlistDto.getKakaoName());
             log.info("wishlist 2 : " + user.getKakaoName());
-            Wishlist wishlist = wishlistRepository.findByUser(user);
+            wishlist = wishlistRepository.findByUser(user);
+            log.info("wish: " + wishlist.toString());
+
             int postCategory = wishlistDto.getPostCategory();
             Long postId = wishlistDto.getPostId();
 
@@ -42,23 +61,55 @@ public class WishlistService {
             } else {
                 Optional<TradePost> tradePostObj = tradePostRepository.findById(postId);
                 TradePost tradePost = tradePostObj.get();
+                log.info("TradePost: "+ tradePost.toString());
 
                 if(tradePost == null)    throw new Exception("wishlist is null");
-                wishlist.getTradePost().add(tradePost);
+                wishlist.getTradePosts().add(tradePost);
+                log.info("wishlist의 tradeposts: " + wishlist.getTradePosts().toString());
+                
                 wishlistRepository.save(wishlist);
-                return true;
             }
         } catch(Exception e){
             log.info(e.getMessage());
-            return false;
+            return null;
         }
-        return false;
+        return wishlist;
+    }
+
+    public Wishlist deletePostAtWishlist(String kakaoName, int postCategory, Long postId) {
+        Wishlist wishlist= null;
+        try {
+            User user = userRepository.findByKakaoName(kakaoName);
+            wishlist = wishlistRepository.findByUser(user);
+
+            if(wishlist == null)    throw new Exception("wishlist is null");
+
+            // 0: 공동구매인 경우
+            if (postCategory == 0) {
+                // 공동구매 아직 구현 X
+
+            } else {
+                Optional<TradePost> tradePostObj = tradePostRepository.findById(postId);
+                TradePost tradePost = tradePostObj.get();
+
+                if(tradePost == null)    throw new Exception("wishlist is null");
+                List<TradePost> tradePosts = wishlist.getTradePosts();
+                tradePosts.stream().filter(post  -> Objects.equals(post.getId(), postId))
+                        .toList().forEach(tradePosts::remove);
+
+                wishlistRepository.save(wishlist);
+
+                log.info("위시 리스트에서 " + postId + "번 게시글이 삭제됨.");
+            }
+        } catch(Exception e) {
+            log.info(e.getMessage());
+        }
+        return wishlist;
     }
 
     public Wishlist getWishlistByKakaoName(String kakaoName) {
         User user = userRepository.findByKakaoName(kakaoName);
-        Wishlist wishlist = wishlistRepository.findByUser(user);
 
-        return wishlist;
+        return wishlistRepository.findByUser(user);
     }
 }

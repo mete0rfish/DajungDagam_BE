@@ -1,16 +1,16 @@
 package com.dajungdagam.dg.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table
+@ToString
 public class TradePost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,7 +58,7 @@ public class TradePost extends BaseEntity {
     private TradeStatus tradeStatus;
 
     @ManyToOne
-    @JoinColumn(name = "wish_id")
+    @JoinColumn(name = "wishlist_id")
     private Wishlist wishlist;
 
     @Builder

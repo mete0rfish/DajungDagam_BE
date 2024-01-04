@@ -6,6 +6,7 @@ import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.service.TradePostService;
 import com.dajungdagam.dg.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
+@Slf4j
 public class TradePostController {
 
     private TradePostService tradePostService;
@@ -45,7 +47,8 @@ public class TradePostController {
 //	}
 
     @PostMapping("/trade/posts")
-    public String write(Authentication authentication, TradePostDto tradePostDto) {
+    public String write(@RequestBody TradePostDto tradePostDto, Authentication authentication) {
+        log.info("title: " + tradePostDto.getTitle() + " , content : " + tradePostDto.getContent());
         try {
             if(authentication == null)
                 throw new Exception("authentication is null. non user Info");
