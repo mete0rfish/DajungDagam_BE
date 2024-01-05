@@ -102,7 +102,7 @@ public class UserService {
 
             User user = repository.findByKakaoName(kakaoName);
             if(user == null)
-                throw new Exception("닉네임을 변경할 유저의 정보가 없습니다.");
+                throw new Exception("유저의 정보가 없습니다.");
 
             user.setNickName(nickName);
 
@@ -126,7 +126,7 @@ public class UserService {
 
             UserResponseDto userResponseDto = findByUserKakaoNickName(kakaoName);
             if(userResponseDto.getUser() == null)
-                throw new Exception("닉네임을 변경할 유저의 정보가 없습니다.");
+                throw new Exception("유저의 정보가 없습니다.");
 
             User user = userResponseDto.getUser();
             Area area = areaRepository.findByGuNameAndDongName(gu, dong);
@@ -141,9 +141,32 @@ public class UserService {
         return id;
     }
 
+    @Transactional
+    public int updateUserInfo(String kakaoName, String info) {
+        int id = -1;
+        try{
+
+            UserResponseDto userResponseDto = findByUserKakaoNickName(kakaoName);
+            if(userResponseDto.getUser() == null)
+                throw new Exception("유저의 정보가 없습니다.");
+
+            User user = userResponseDto.getUser();
+            user.setInfo(info);
+
+            id = repository.save(user).getId();
+
+        } catch(Exception e){
+            e.getStackTrace();
+        }
+
+        return id;
+    }
+
     public boolean isSameUser(int userId, UserResponseDto userResponseDto){
         User user = userResponseDto.getUser();
         return user.getId() == userId;
     }
+
+
 
 }

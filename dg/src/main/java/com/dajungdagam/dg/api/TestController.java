@@ -109,4 +109,16 @@ public class TestController {
         log.info("id: " + id + " 유저의 사는 곳이 업데이트 됨.");
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/login/details/v3")
+    public ResponseEntity<String> loginDetailsInfo(@RequestParam String kakaoName, @RequestBody String info) {
+        int id = userService.updateUserInfo(kakaoName, info);
+
+        if (id == -1) {
+            return ResponseEntity.notFound().build();
+        }
+
+        log.info("id: " + id + " 유저의 소개글이 업데이트 됨.");
+        return ResponseEntity.ok().build();
+    }
 }
