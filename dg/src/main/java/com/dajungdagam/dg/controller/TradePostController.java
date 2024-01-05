@@ -2,6 +2,7 @@ package com.dajungdagam.dg.Controller;
 
 
 import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.entity.Image;
 import com.dajungdagam.dg.domain.entity.TradePost;
 import com.dajungdagam.dg.service.TradePostService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,7 +10,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -42,8 +46,12 @@ public class TradePostController {
 //	}
 
     @PostMapping("/trade/posts")
-    public String write(TradePostDto tradePostDto) {
-        tradePostService.savePost(tradePostDto);
+    public String write(@ModelAttribute TradePostDto tradePostDto,
+                        @RequestParam MultipartFile[] images) throws IOException {
+
+        //tradePostDto.setCreatedTime(LocalDateTime.now());
+        tradePostService.savePost(tradePostDto, images);
+
         return "redirect:/";
     }
 
@@ -67,9 +75,10 @@ public class TradePostController {
     }
 
     @PatchMapping("/trade/posts/update/{id}")
-    public String update(@PathVariable Long id, TradePostDto tradePostDto, HttpServletResponse response) {
+    public String update(@PathVariable Long id, TradePostDto tradePostDto,
+                         HttpServletResponse response, @RequestParam MultipartFile[] images) throws IOException {
         tradePostDto.setId(id);
-        tradePostService.savePost(tradePostDto);
+        tradePostService.savePost(tradePostDto, images); //, image
 
         response.setHeader(HttpHeaders.ALLOW, "GET, POST, PUT, PATCH, DELETE");
 

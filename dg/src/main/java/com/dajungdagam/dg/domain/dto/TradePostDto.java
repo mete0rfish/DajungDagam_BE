@@ -3,8 +3,11 @@ package com.dajungdagam.dg.domain.dto;
 
 import com.dajungdagam.dg.domain.entity.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.*;
+import java.util.List;
+
 @Getter
 @Setter // Setter랑 ToString 없으면 DB 내에 저장이 안되더라.
 @ToString
@@ -63,6 +66,5 @@ public class TradePostDto {
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
     }
-
 
 }
