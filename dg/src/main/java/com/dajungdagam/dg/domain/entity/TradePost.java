@@ -68,7 +68,7 @@ public class TradePost extends BaseEntity {
     @Column(name = "trade_status")
     private TradeStatus tradeStatus;
 
-    @OneToMany(mappedBy = "tradePost", cascade = CascadeType.ALL, orphanRemoval = true,
+    @OneToMany(mappedBy = "tradePost", cascade = CascadeType.ALL, //orphanRemoval = true,
                 fetch = FetchType.LAZY)
     private List<Image> images = new ArrayList<>();
 

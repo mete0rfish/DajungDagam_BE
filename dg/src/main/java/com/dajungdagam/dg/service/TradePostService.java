@@ -7,6 +7,7 @@ import com.dajungdagam.dg.domain.entity.TradePost;
 import com.dajungdagam.dg.repository.ImageRepository;
 import com.dajungdagam.dg.repository.TradePostRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -97,7 +98,6 @@ public class TradePostService {
              if (images.length < 1) {
                  throw new IllegalArgumentException("최소 하나의 이미지를 업로드해야 합니다.");
              }
-
              // 최대 5개의 이미지만 업로드하도록 검증
              if (images.length > 5) {
                  throw new IllegalArgumentException("최대 5개의 이미지만 업로드할 수 있습니다.");
@@ -149,6 +149,9 @@ public class TradePostService {
 
      }
 
+    public List<Image> getImagesByTradePost(TradePost tradePost) {
+        return imageRepository.findByTradePost(tradePost);
+    }
 
     @Transactional
     public List<TradePostDto> getPostlist(Integer pageNum) {
@@ -235,7 +238,12 @@ public class TradePostService {
         return tradePostDto;
     }
 
-    @Transactional
+    @Transactional // 게시물 수정
+    public void updatePost(TradePostDto tradePostDto) {
+        tradePostRepository.save(tradePostDto.toEntity()).getId();
+    }
+
+    @Transactional // 게시물 삭제
     public void deletePost(Long id) {
         tradePostRepository.deleteById(id);
     }
@@ -245,5 +253,11 @@ public class TradePostService {
     public int updateView(Long id) {
         return tradePostRepository.updateviewCount(id);
     }
+
+    @Transactional
+    public void deleteImage(Long id) {
+        imageRepository.deleteById(id);
+    }
+
 
 }
