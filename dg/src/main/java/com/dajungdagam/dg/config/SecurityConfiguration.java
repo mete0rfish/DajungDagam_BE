@@ -62,6 +62,7 @@ public class SecurityConfiguration {
                 .cors().and()
                 .authorizeRequests()
                 .requestMatchers("/login/**").permitAll() // login은 전체 허용
+                .requestMatchers("/login/logout/**").permitAll() // login은 전체 허용
                 .requestMatchers("/h2-console/**").permitAll() // h2-console은 전체 허용
                 .requestMatchers("/trade/**").permitAll() // h2-console은 전체 허용
                 .requestMatchers(HttpMethod.POST, "/mypage/**").authenticated() // mypage는 인증하도록 설정

@@ -2,6 +2,7 @@ package com.dajungdagam.dg.domain.entity;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,7 +38,8 @@ public class User {
     @Column(length = 50)
     private String info;
 
-    public User(int id, @Nullable String email, @Nullable String nickName, @Nullable String kakaoName, Area area, RoleType role, String info) {
+    @Builder
+    public User(int id, String email, String nickName, String kakaoName, Area area, RoleType role, String info) {
         this.id = id;
         this.email = email;
         this.nickName = nickName;
@@ -47,13 +49,11 @@ public class User {
         this.info = info;
     }
 
-    public User(int id, String kakaoName, RoleType role) {
-        this.id = id;
+    public User(String kakaoName, RoleType role) {
         this.kakaoName = kakaoName;
         this.role = role;
     }
 
     public User() {
-
     }
 }

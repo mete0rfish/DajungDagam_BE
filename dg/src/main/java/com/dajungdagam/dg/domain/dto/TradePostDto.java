@@ -24,6 +24,7 @@ public class TradePostDto {
     private Long wishlistCount;
     private String chatLink;
     private TradeStatus tradeStatus;
+    private Wishlist wishlist;
 
     public TradePost toEntity() {
         return TradePost.builder()
@@ -47,7 +48,7 @@ public class TradePostDto {
     public TradePostDto(Long id, User user, Area area, String title, PostType postType,
                         String tradeArea, String content, LocalDateTime createdTime,
                         LocalDateTime updateTime, Long viewCount, Long wishlistCount,
-                        String chatLink, TradeStatus tradeStatus)
+                        String chatLink, TradeStatus tradeStatus, Wishlist wishlist)
     {
         this.id = id;
         this.user = user;
@@ -62,6 +63,7 @@ public class TradePostDto {
         this.wishlistCount = wishlistCount;
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
+        this.wishlist = wishlist;
     }
 
 }

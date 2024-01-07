@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -35,6 +36,7 @@ import static org.hibernate.query.sqm.tree.SqmNode.log;
 @Component
 @Getter
 @PropertySource({"META-INF/application-private.properties"})
+@Slf4j
 public class kakaoApi {
 
     @Value("${kakao.api_key}")
@@ -192,7 +194,7 @@ public class kakaoApi {
             conn.setRequestProperty("Authorization", "Bearer " + accessToken);
 
             int responseCode = conn.getResponseCode();
-            //log.info("[KakaoApi.kakaoLogout] responseCode : {}",  responseCode);
+            log.info("[KakaoApi.kakaoLogout] responseCode : " +  Integer.toString(responseCode));
 
             BufferedReader br;
             if (responseCode >= 200 && responseCode <= 300) {
@@ -207,7 +209,7 @@ public class kakaoApi {
                 responseSb.append(line);
             }
             String result = responseSb.toString();
-            //log.info("kakao logout - responseBody = {}", result);
+            log.info("kakao logout - responseBody = {}", result);
 
         }catch (Exception e){
             e.printStackTrace();

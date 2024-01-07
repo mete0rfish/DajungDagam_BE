@@ -10,6 +10,8 @@ public class UserResponseDto {
 
     private User user;
 
+
+
     public UserResponseDto(User user) {
         this.user = user;
     }

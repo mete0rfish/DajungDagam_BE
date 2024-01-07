@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 public class Area {
     @Id
+    @GeneratedValue
     @Column(name = "area_id")
     private int id;
     @Column(name = "GUNAME")
