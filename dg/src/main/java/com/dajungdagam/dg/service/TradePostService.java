@@ -3,8 +3,10 @@ package com.dajungdagam.dg.service;
 import com.dajungdagam.dg.domain.dto.ImageDto;
 import com.dajungdagam.dg.domain.dto.TradePostDto;
 import com.dajungdagam.dg.domain.entity.Image;
+import com.dajungdagam.dg.domain.entity.ItemCategory;
 import com.dajungdagam.dg.domain.entity.TradePost;
 import com.dajungdagam.dg.repository.ImageRepository;
+import com.dajungdagam.dg.repository.ItemCategoryRepository;
 import com.dajungdagam.dg.repository.TradePostRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +34,17 @@ public class TradePostService {
     private TradePostRepository tradePostRepository;
     private ImageRepository imageRepository;
 
+    private ItemCategoryRepository itemCategoryRepository;
+
     private static final int BLOCK_PAGE_NUM_COUNT = 5; // 블럭에 존재하는 페이지 수
     private static final int PAGE_POST_COUNT = 9; // 한 페이지에 존재하는 게시글 수
 
-     public TradePostService(TradePostRepository tradePostRepository, ImageRepository imageRepository) {
+    @Autowired
+     public TradePostService(TradePostRepository tradePostRepository, ImageRepository imageRepository,
+                             ItemCategoryRepository itemCategoryRepository) {
         this.tradePostRepository = tradePostRepository;
         this.imageRepository = imageRepository;
+        this.itemCategoryRepository = itemCategoryRepository;
     }
 
     @Transactional
@@ -68,6 +75,7 @@ public class TradePostService {
                 .wishlistCount(tradePost.getWishlistCount())
                 .chatLink(tradePost.getChatLink())
                 .tradeStatus(tradePost.getTradeStatus())
+                .itemCategory(tradePost.getItemCategory())
                 .build();
     }
 
@@ -177,6 +185,7 @@ public class TradePostService {
                     .wishlistCount(tradePost.getWishlistCount())
                     .chatLink(tradePost.getChatLink())
                     .tradeStatus(tradePost.getTradeStatus())
+                    .itemCategory(tradePost.getItemCategory())
                     .build();
             tradePostDtoList.add(tradePostDto);
         }
@@ -233,6 +242,7 @@ public class TradePostService {
                 .wishlistCount(tradePost.getWishlistCount())
                 .chatLink(tradePost.getChatLink())
                 .tradeStatus(tradePost.getTradeStatus())
+                .itemCategory(tradePost.getItemCategory())
                 .build();
 
         return tradePostDto;
@@ -254,10 +264,21 @@ public class TradePostService {
         return tradePostRepository.updateviewCount(id);
     }
 
+//    @Transactional // 게시글 수정 시 파일 삭제 기능 (일단 보류)
+//    public void deleteImage(Long id) {
+//        imageRepository.deleteById(id);
+//    }
+
+    // 해당 카테고리에 속한 게시글 검색
     @Transactional
-    public void deleteImage(Long id) {
-        imageRepository.deleteById(id);
+    public List<TradePost> getTradePostsByCategory(ItemCategory itemCategory) {
+        return tradePostRepository.findByItemCategory(itemCategory);
     }
 
-
+    // 해당 ID에 해당하는 카테고리 조회
+    @Transactional
+    public ItemCategory getItemCategoryById(Long id) {
+        return itemCategoryRepository.findById(id).orElse(null);
+    }
 }
+

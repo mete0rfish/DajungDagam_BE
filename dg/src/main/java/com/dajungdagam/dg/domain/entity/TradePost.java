@@ -72,12 +72,16 @@ public class TradePost extends BaseEntity {
                 fetch = FetchType.LAZY)
     private List<Image> images = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_category_id")
+    private ItemCategory itemCategory;
+
 
     @Builder
     public TradePost(Long id, User user, Area area, String title, PostType postType,
                      String tradeArea, String content, LocalDateTime createdTime,
                      LocalDateTime updateTime, int viewCount, Long wishlistCount,
-                     String chatLink, TradeStatus tradeStatus, List<Image> images) {
+                     String chatLink, TradeStatus tradeStatus, List<Image> images, ItemCategory itemCategory) {
         this.id = id;
         this.user = user;
         this.area = area;
@@ -92,6 +96,7 @@ public class TradePost extends BaseEntity {
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
         this.images = images;
+        this.itemCategory = itemCategory;
     }
 
 }

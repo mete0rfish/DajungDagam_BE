@@ -19,11 +19,11 @@
     <!-- 업로드된 파일 정보 표시 -->
     <div th:each="images : ${images}">
         <p th:text="${'파일 ' + images.id + ': ' + images.imageName}">
-             파일 삭제 버튼
-            <form th:action="@{'/trade/posts/deleteImage/' + ${tradepostDto.id} + '/' + ${images.id}}" method="post">
-                <input type="hidden" name="_method" value="delete"/>
-                <button type="submit">삭제</button>
-            </form>
+            <!-- 파일 삭제 버튼 -->
+<!--            <form th:action="@{'/trade/posts/deleteImage/' + ${tradepostDto.id} + '/' + ${status.index}}" method="post">-->
+<!--                <input type="hidden" name="_method" value="delete"/>-->
+<!--                <button type="submit">삭제</button>-->
+<!--            </form>-->
         </p>
     </div>
 
