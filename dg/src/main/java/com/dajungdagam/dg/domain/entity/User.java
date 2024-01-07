@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity(name="users")
 @Getter
 @Setter
@@ -27,8 +29,7 @@ public class User {
     @Nullable
     private String kakaoName;
 
-
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="area_id")
     private Area area;
 

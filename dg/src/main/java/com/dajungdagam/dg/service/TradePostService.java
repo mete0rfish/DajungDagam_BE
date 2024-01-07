@@ -4,9 +4,12 @@ import com.dajungdagam.dg.domain.dto.TradePostDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.entity.TradePost;
 import com.dajungdagam.dg.domain.entity.User;
+import com.dajungdagam.dg.domain.entity.Wishlist;
 import com.dajungdagam.dg.repository.TradePostRepository;
+import com.dajungdagam.dg.repository.WishListJpaRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,11 +20,12 @@ import java.util.Optional;
 @Slf4j
 public class TradePostService {
 
+    @Autowired
     private TradePostRepository tradePostRepository;
-
-    public TradePostService(TradePostRepository tradePostRepository) {
-        this.tradePostRepository = tradePostRepository;
-    }
+    @Autowired
+    private WishlistService wishlistService;
+    @Autowired
+    private WishListJpaRepository wishlistRepository;
 
     @Transactional
     public List<TradePostDto> searchPosts(String keyword) {
@@ -52,6 +56,18 @@ public class TradePostService {
         }
 
         return tradePostDtoList;
+    }
+
+    @Transactional
+    public List<TradePost> getAllTradePostWithUserId(int userId) {
+        List<TradePost> tradePosts = tradePostRepository.findAllByUserId(userId);
+
+        if(tradePosts.isEmpty()){
+            log.info("tradePosts is Empty");
+            return null;
+        }
+
+        return tradePosts;
     }
 
     private TradePostDto convertEntityToDto(TradePost tradePost) {
@@ -108,6 +124,29 @@ public class TradePostService {
     @Transactional
     public void deletePost(Long id) {
         tradePostRepository.deleteById(id);
+    }
+
+    @Transactional
+    public boolean deleteAllPost(User user) {
+        int userId = user.getId();
+        String kakaoName = user.getKakaoName();
+
+        List<TradePost> tradePostList= this.getAllTradePostWithUserId(userId);
+        Wishlist wishlist = wishlistService.getWishlistByKakaoName(kakaoName);
+
+
+        for(TradePost tradePost : wishlist.getTradePosts()) {
+            tradePostRepository.deleteById(tradePost.getId());
+        }
+
+        for(TradePost tradePost : tradePostList) {
+            tradePostRepository.deleteById(tradePost.getId());
+        }
+
+        wishlistRepository.deleteById(wishlist.getId());
+
+        tradePostList= this.getAllTradePostWithUserId(userId);
+        return tradePostList == null;
     }
 
 
