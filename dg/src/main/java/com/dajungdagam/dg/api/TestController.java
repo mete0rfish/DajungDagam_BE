@@ -1,5 +1,6 @@
 package com.dajungdagam.dg.api;
 
+import com.dajungdagam.dg.domain.dto.UserInfoResponseDto;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
 import com.dajungdagam.dg.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -111,7 +112,9 @@ public class TestController {
     }
 
     @PostMapping("/login/details/v3")
-    public ResponseEntity<String> loginDetailsInfo(@RequestParam String kakaoName, @RequestBody String info) {
+    public ResponseEntity<String> loginDetailsInfo(@RequestParam String kakaoName, @RequestBody UserInfoResponseDto userInfoResponseDto) {
+
+        String info = userInfoResponseDto.getInfo();
         int id = userService.updateUserInfo(kakaoName, info);
 
         if (id == -1) {
