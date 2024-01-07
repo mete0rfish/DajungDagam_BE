@@ -34,10 +34,12 @@ public class TradePostController {
     }
 
     @GetMapping("/trade/like-posts")
-    public TradePostSummaryDto liked_list() {
+    public List<TradePostSummaryDto> liked_list() {
 
+        List<TradePostSummaryDto> likePostsSummaryDtos = tradePostService.getLikePosts();
+        return likePostsSummaryDtos;
         //인기글 목록에는 모든 정보가 필요하지 않다. -> TradePostSummaryDto를 이용하여 반환
-        return new TradePostSummaryDto();
+        //return new TradePostSummaryDto();
     }
 
     @PostMapping("/trade/posts")

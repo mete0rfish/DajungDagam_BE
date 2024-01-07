@@ -1,6 +1,7 @@
 package com.dajungdagam.dg.service;
 
 import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.dto.TradePostSummaryDto;
 import com.dajungdagam.dg.domain.entity.TradePost;
 import com.dajungdagam.dg.repository.TradePostRepository;
 import jakarta.transaction.Transactional;
@@ -87,5 +88,24 @@ public class TradePostService {
     @Transactional
     public void deletePost(Long id) {
         tradePostRepository.deleteById(id);
+    }
+
+    public List<TradePostSummaryDto> getLikePosts() {
+        List<TradePost> likePosts = tradePostRepository.findTop3ByOrderByWishlistDesc();
+        List<TradePostSummaryDto> summaryDtos = new ArrayList<>();
+        for (TradePost likePost : likePosts) {
+            TradePostSummaryDto tradePostSummaryDto = TradePostSummaryDto.builder()
+                    .id(likePost.getId())
+                    .user(likePost.getUser())
+                    .title(likePost.getTitle())
+                    .tradeArea(likePost.getTradeArea())
+                    .content(likePost.getContent())
+                    .viewCount(likePost.getViewCount())
+                    .wishlistCount(likePost.getWishlistCount())
+                    .tradeStatus(likePost.getTradeStatus())
+                    .build();
+            summaryDtos.add(tradePostSummaryDto);
+        }
+        return summaryDtos;
     }
 }

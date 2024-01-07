@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface TradePostRepository extends JpaRepository<TradePost, Long> {
     List<TradePost> findByTitleContaining(String keyword);
+
+    List<TradePost> findTop3ByOrderByWishlistDesc();
 }
