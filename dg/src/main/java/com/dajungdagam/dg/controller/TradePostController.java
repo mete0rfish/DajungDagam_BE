@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,7 +47,7 @@ public class TradePostController {
 //		return "save";
 //	}
 
-    @PostMapping("/trade/posts")
+    @PostMapping(value = "/trade/posts",  consumes = MediaType.APPLICATION_JSON_VALUE)
     public String write(@RequestBody TradePostDto tradePostDto, Authentication authentication) {
         log.info("title: " + tradePostDto.getTitle() + " , content : " + tradePostDto.getContent());
         try {
