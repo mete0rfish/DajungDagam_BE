@@ -1,5 +1,8 @@
 package com.dajungdagam.dg.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,25 +19,20 @@ public class TradePost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tp_id")
-    @Getter
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    @Getter
     private User user;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
-    @Getter
     private Area area;
 
     @Column(length = 50, name = "tp_title")
-    @Getter
     private String title;
 
     @Enumerated(EnumType.STRING)
-    @Getter
     @Column(name = "post_type")
     private PostType postType;
 
@@ -64,7 +62,6 @@ public class TradePost extends BaseEntity {
     private TradeStatus tradeStatus;
 
     @Builder
-
     public TradePost(Long id, User user, Area area, String title, PostType postType, String tradeArea, String content, LocalDateTime createdTime, LocalDateTime updateTime, Long viewCount, Long wishlistCount, String chatLink, TradeStatus tradeStatus) {
         this.id = id;
         this.user = user;

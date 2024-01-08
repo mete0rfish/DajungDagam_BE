@@ -11,4 +11,6 @@ public interface TradePostRepository extends JpaRepository<TradePost, Long> {
 
     List<TradePost> findByTitleContaining(String keyword);
     List<TradePost> findByUserId(int userId);
+
+    List<TradePost> findAllByUserId(int userId);
 }

@@ -2,11 +2,11 @@ package com.dajungdagam.dg.api;
 
 import com.dajungdagam.dg.domain.dto.UserInfoResponseDto;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -123,5 +123,26 @@ public class TestController {
 
         log.info("id: " + id + " 유저의 소개글이 업데이트 됨.");
         return ResponseEntity.ok().build();
+    }
+
+
+    // 현재 로그인한 유저인지 확인하는 코드 패스
+    @DeleteMapping("/login/delete")
+    public ResponseEntity<String> deleteUser(@RequestParam String kakaoName) {
+        UserResponseDto userResponseDto = null;
+        try{
+            userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+            if(userResponseDto == null) throw new Exception("user 정보가 없음");
+
+            boolean res = userService.deleteUser(userResponseDto);
+            if(!res) throw new Exception("회원 탈퇴 실패");
+
+            return ResponseEntity.ok().build();
+        } catch(Exception e) {
+            log.error(e.getMessage());
+
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 }

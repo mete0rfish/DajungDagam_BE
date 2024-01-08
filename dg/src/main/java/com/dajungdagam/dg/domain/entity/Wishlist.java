@@ -1,6 +1,9 @@
 package com.dajungdagam.dg.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +19,9 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Wishlist {
     @Id
     @GeneratedValue
@@ -23,10 +29,11 @@ public class Wishlist {
     private Long id;
 
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @Setter
     @Getter
     @JsonManagedReference
+    @JsonIgnore
     private List<TradePost> tradePosts;
 
     @Column

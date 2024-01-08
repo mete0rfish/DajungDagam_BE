@@ -1,11 +1,9 @@
 package com.dajungdagam.dg.service;
 
-import com.dajungdagam.dg.domain.entity.Area;
-import com.dajungdagam.dg.domain.entity.RoleType;
-import com.dajungdagam.dg.domain.entity.User;
+import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
-import com.dajungdagam.dg.domain.entity.Wishlist;
 import com.dajungdagam.dg.jwt.RefreshToken;
 import com.dajungdagam.dg.jwt.jwtTokenProvider;
 import com.dajungdagam.dg.repository.AreaJpaRepository;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -38,6 +37,9 @@ public class UserService {
 
     @Autowired
     private AreaJpaRepository areaRepository;
+
+    @Autowired
+    private TradePostService tradePostService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -162,8 +164,26 @@ public class UserService {
         return id;
     }
 
+    @Transactional
+    public boolean deleteUser(UserResponseDto userResponseDto) {
+        try {
+            User user = userResponseDto.getUser();
+
+            boolean res = tradePostService.deleteAllPost(user);
+            if (!res) throw new Exception("User delete failed!");
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
     public boolean isSameUser(int userId, UserResponseDto userResponseDto){
         User user = userResponseDto.getUser();
+
+
         return user.getId() == userId;
     }
 
