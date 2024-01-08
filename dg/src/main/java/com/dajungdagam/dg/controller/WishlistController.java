@@ -1,9 +1,7 @@
 package com.dajungdagam.dg.controller;
 
-import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.dto.WishlistDto;
 import com.dajungdagam.dg.domain.entity.Wishlist;
-import com.dajungdagam.dg.repository.WishListJpaRepository;
 import com.dajungdagam.dg.service.UserService;
 import com.dajungdagam.dg.service.WishlistService;
 import lombok.extern.slf4j.Slf4j;

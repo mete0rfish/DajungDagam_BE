@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -98,13 +99,12 @@ public class UserService {
 
     // 유저 별명 업데이트
     @Transactional
-    public int updateUserNickName(String kakaoName, String nickName) {
+    public int updateUserNickName(int userId, String nickName) {
         int id = -1;
         try{
 
-            User user = repository.findByKakaoName(kakaoName);
-            if(user == null)
-                throw new Exception("유저의 정보가 없습니다.");
+            Optional<User> userObj = repository.findById(userId);
+            User user = userObj.get();
 
             user.setNickName(nickName);
 
@@ -122,15 +122,13 @@ public class UserService {
     // 유저 사는곳 업데이트
 
     @Transactional
-    public int updateUserArea(String kakaoName, String gu, String dong){
+    public int updateUserArea(int userId, String gu, String dong){
         int id = -1;
         try{
 
-            UserResponseDto userResponseDto = findByUserKakaoNickName(kakaoName);
-            if(userResponseDto.getUser() == null)
-                throw new Exception("유저의 정보가 없습니다.");
+            Optional<User> userObj = repository.findById(userId);
+            User user = userObj.get();
 
-            User user = userResponseDto.getUser();
             Area area = areaRepository.findByGuNameAndDongName(gu, dong);
             user.setArea(area);
 
@@ -144,15 +142,13 @@ public class UserService {
     }
 
     @Transactional
-    public int updateUserInfo(String kakaoName, String info) {
+    public int updateUserInfo(int userId, String info) {
         int id = -1;
         try{
 
-            UserResponseDto userResponseDto = findByUserKakaoNickName(kakaoName);
-            if(userResponseDto.getUser() == null)
-                throw new Exception("유저의 정보가 없습니다.");
+            Optional<User> userObj = repository.findById(userId);
+            User user = userObj.get();
 
-            User user = userResponseDto.getUser();
             user.setInfo(info);
 
             id = repository.save(user).getId();
@@ -164,10 +160,12 @@ public class UserService {
         return id;
     }
 
+
     @Transactional
-    public boolean deleteUser(UserResponseDto userResponseDto) {
+    public boolean deleteUser(int userId) {
         try {
-            User user = userResponseDto.getUser();
+            Optional<User> userObj = repository.findById(userId);
+            User user = userObj.get();
 
             boolean res = tradePostService.deleteAllPost(user);
             if (!res) throw new Exception("User delete failed!");
@@ -179,6 +177,21 @@ public class UserService {
 
         return true;
     }
+//    @Transactional
+//    public boolean deleteUser(UserResponseDto userResponseDto) {
+//        try {
+//            User user = userResponseDto.getUser();
+//
+//            boolean res = tradePostService.deleteAllPost(user);
+//            if (!res) throw new Exception("User delete failed!");
+//
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     public boolean isSameUser(int userId, UserResponseDto userResponseDto){
         User user = userResponseDto.getUser();

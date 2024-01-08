@@ -67,6 +67,7 @@ public class TestController {
         //String email = (String)userInfo.get("email");
         String kakaoName = userKakaoLoginResponseDto.getUser().getKakaoName();
         String jwtToken = userKakaoLoginResponseDto.getJwtToken();
+        int userId = userKakaoLoginResponseDto.getUser().getId();
 
         // 6. 세션에 access Token 저장
         session.setAttribute("accessToken", accessToken);
@@ -86,10 +87,11 @@ public class TestController {
         return ResponseEntity.ok("logouted!");
     }
 
+    // 변경 완료
     @PostMapping("/login/details/v1")
-    public ResponseEntity<String> loginDetailsNickName(@RequestParam String kakaoName, @RequestParam String nickName) {
-        log.info("requestParam됨. " + kakaoName + " " + nickName);
-        int id = userService.updateUserNickName(kakaoName, nickName);
+    public ResponseEntity<String> loginDetailsNickName(@RequestParam int userId, @RequestParam String nickName) {
+        log.info("requestParam됨. " + userId + " " + nickName);
+        int id = userService.updateUserNickName(userId, nickName);
 
         if (id == -1) {
             return ResponseEntity.notFound().build();
@@ -99,9 +101,10 @@ public class TestController {
         return ResponseEntity.ok().build();
     }
 
+    // 변경 완료
     @PostMapping("/login/details/v2")
-    public ResponseEntity<String> loginDetailsArea(@RequestParam String kakaoName, @RequestParam String gu_name, @RequestParam String dong_name) {
-        int id = userService.updateUserArea(kakaoName, gu_name, dong_name);
+    public ResponseEntity<String> loginDetailsArea(@RequestParam int userId, @RequestParam String gu_name, @RequestParam String dong_name) {
+        int id = userService.updateUserArea(userId, gu_name, dong_name);
 
         if (id == -1) {
             return ResponseEntity.notFound().build();
@@ -111,11 +114,12 @@ public class TestController {
         return ResponseEntity.ok().build();
     }
 
+    // 변경 완료
     @PostMapping("/login/details/v3")
-    public ResponseEntity<String> loginDetailsInfo(@RequestParam String kakaoName, @RequestBody UserInfoResponseDto userInfoResponseDto) {
+    public ResponseEntity<String> loginDetailsInfo(@RequestParam int userId, @RequestBody UserInfoResponseDto userInfoResponseDto) {
 
         String info = userInfoResponseDto.getInfo();
-        int id = userService.updateUserInfo(kakaoName, info);
+        int id = userService.updateUserInfo(userId, info);
 
         if (id == -1) {
             return ResponseEntity.notFound().build();
@@ -127,22 +131,37 @@ public class TestController {
 
 
     // 현재 로그인한 유저인지 확인하는 코드 패스
+    // 변경 완료
     @DeleteMapping("/login/delete")
-    public ResponseEntity<String> deleteUser(@RequestParam String kakaoName) {
-        UserResponseDto userResponseDto = null;
-        try{
-            userResponseDto = userService.findByUserKakaoNickName(kakaoName);
-            if(userResponseDto == null) throw new Exception("user 정보가 없음");
+    public ResponseEntity<String> deleteUser(@RequestParam int userId) {
 
-            boolean res = userService.deleteUser(userResponseDto);
-            if(!res) throw new Exception("회원 탈퇴 실패");
+    try{
+        boolean res = userService.deleteUser(userId);
 
-            return ResponseEntity.ok().build();
-        } catch(Exception e) {
-            log.error(e.getMessage());
+        if(!res)    throw new Exception("회원 탈퇴 실패");
 
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok().build();
+    } catch(Exception e){
+
+        log.error(e.getMessage());
+         return ResponseEntity.badRequest().build();
+    }
+
+
+        //        UserResponseDto userResponseDto = null;
+//        try{
+//            userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+//            if(userResponseDto == null) throw new Exception("user 정보가 없음");
+//
+//            boolean res = userService.deleteUser(userResponseDto);
+//            if(!res) throw new Exception("회원 탈퇴 실패");
+//
+//            return ResponseEntity.ok().build();
+//        } catch(Exception e) {
+//            log.error(e.getMessage());
+//
+//            return ResponseEntity.badRequest().build();
+//        }
 
     }
 }
