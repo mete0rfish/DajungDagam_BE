@@ -129,7 +129,7 @@ public class TradePostService {
 
 
     public List<TradePostSummaryDto> getLikePosts() {
-        List<TradePost> likePosts = tradePostRepository.findTop3ByOrderByWishlistDesc();
+        List<TradePost> likePosts = tradePostRepository.findTop3ByOrderByWishlistCountDesc();
         List<TradePostSummaryDto> summaryDtos = new ArrayList<>();
         for (TradePost likePost : likePosts) {
             TradePostSummaryDto tradePostSummaryDto = TradePostSummaryDto.builder()
