@@ -25,11 +25,11 @@ public class PostDto {
     private Long wishlistCount;
     private String chatLink;
     private TradeStatus tradeStatus;
-<<<<<<< HEAD:dg/src/main/java/com/dajungdagam/dg/domain/dto/TradePostDto.java
+
     private Wishlist wishlist;
-=======
+
     private ItemCategory itemCategory;
->>>>>>> pr/9:dg/src/main/java/com/dajungdagam/dg/domain/dto/PostDto.java
+
 
     public Post toEntity() {
         return Post.builder()
@@ -51,17 +51,12 @@ public class PostDto {
     }
 
     @Builder
-<<<<<<< HEAD:dg/src/main/java/com/dajungdagam/dg/domain/dto/TradePostDto.java
-    public TradePostDto(Long id, User user, Area area, String title, PostType postType,
-                        String tradeArea, String content, LocalDateTime createdTime,
-                        LocalDateTime updateTime, Long viewCount, Long wishlistCount,
-                        String chatLink, TradeStatus tradeStatus, Wishlist wishlist)
-=======
+
     public PostDto(Long id, User user, Area area, String title, int postType,
                    String tradeArea, String content, LocalDateTime createdTime,
                    LocalDateTime updateTime, int viewCount, Long wishlistCount,
                    String chatLink, TradeStatus tradeStatus, ItemCategory itemCategory)
->>>>>>> pr/9:dg/src/main/java/com/dajungdagam/dg/domain/dto/PostDto.java
+
     {
         this.id = id;
         this.user = user;
@@ -76,11 +71,9 @@ public class PostDto {
         this.wishlistCount = wishlistCount;
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
-<<<<<<< HEAD:dg/src/main/java/com/dajungdagam/dg/domain/dto/TradePostDto.java
         this.wishlist = wishlist;
-=======
         this.itemCategory = itemCategory;
->>>>>>> pr/9:dg/src/main/java/com/dajungdagam/dg/domain/dto/PostDto.java
+
     }
 
 }

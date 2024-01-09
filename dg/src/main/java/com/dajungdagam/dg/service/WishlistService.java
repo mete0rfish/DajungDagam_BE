@@ -4,7 +4,6 @@ import com.dajungdagam.dg.domain.dto.WishlistDto;
 import com.dajungdagam.dg.domain.entity.TradePost;
 import com.dajungdagam.dg.domain.entity.User;
 import com.dajungdagam.dg.domain.entity.Wishlist;
-import com.dajungdagam.dg.repository.TradePostRepository;
 import com.dajungdagam.dg.repository.UserJpaRepository;
 import com.dajungdagam.dg.repository.WishListJpaRepository;
 import jakarta.transaction.Transactional;
@@ -14,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
