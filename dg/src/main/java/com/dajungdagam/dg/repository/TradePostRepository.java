@@ -11,7 +11,7 @@ public interface TradePostRepository extends JpaRepository<TradePost, Long> {
 
     List<TradePost> findByTitleContaining(String keyword);
 
-    List<TradePost> findTop3ByOrderByWishlistDesc();
+    List<TradePost> findTop3ByOrderByWishlistCountDesc();
 
     List<TradePost> findByUserId(int userId);
 
