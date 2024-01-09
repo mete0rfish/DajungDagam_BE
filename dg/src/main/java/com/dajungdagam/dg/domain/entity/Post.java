@@ -4,18 +4,32 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+
 import lombok.*;
 
 import java.time.LocalDateTime;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
 import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table
 @ToString
-public class TradePost extends BaseEntity {
+@DynamicUpdate
+@DynamicInsert
+@Table(name = "post")
+public class Post extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tp_id")
@@ -32,9 +46,8 @@ public class TradePost extends BaseEntity {
     @Column(length = 50, name = "tp_title")
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "post_type")
-    private PostType postType;
+    @Column(name = "post_type", nullable = false)
+    private int postType;
 
     @Column(length = 10, name = "trade_area")
     private String tradeArea;
@@ -48,8 +61,8 @@ public class TradePost extends BaseEntity {
     @Column(columnDefinition = "TIMESTAMP", name = "update_time")
     private LocalDateTime updateTime;
 
-    @Column(columnDefinition = "BIGINT", name = "view_count")
-    private Long viewCount;
+    @Column(columnDefinition = "integer default 0", name = "view_count")
+    private int viewCount;
 
     @Column(columnDefinition = "BIGINT", name = "wishlist_count")
     private Long wishlistCount;
@@ -61,8 +74,21 @@ public class TradePost extends BaseEntity {
     @Column(name = "trade_status")
     private TradeStatus tradeStatus;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, //orphanRemoval = true,
+                fetch = FetchType.LAZY)
+    private List<Image> images = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_category_id")
+    private ItemCategory itemCategory;
+
     @Builder
-    public TradePost(Long id, User user, Area area, String title, PostType postType, String tradeArea, String content, LocalDateTime createdTime, LocalDateTime updateTime, Long viewCount, Long wishlistCount, String chatLink, TradeStatus tradeStatus) {
+    public Post(Long id, User user, Area area, String title, int postType,
+                String tradeArea, String content, LocalDateTime createdTime,
+                LocalDateTime updateTime, int viewCount, Long wishlistCount,
+                String chatLink, TradeStatus tradeStatus, List<Image> images,
+                ItemCategory itemCategory) {
+
         this.id = id;
         this.user = user;
         this.area = area;
@@ -76,5 +102,8 @@ public class TradePost extends BaseEntity {
         this.wishlistCount = wishlistCount;
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
+        this.images = images;
+        this.itemCategory = itemCategory;
     }
+
 }
