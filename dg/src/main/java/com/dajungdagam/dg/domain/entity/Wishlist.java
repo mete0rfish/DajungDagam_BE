@@ -36,7 +36,7 @@ public class Wishlist {
     @JsonIgnore
     private List<TradePost> tradePosts;
 
-    @Column
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime createdTime;
 
     @OneToOne(fetch =  FetchType.LAZY)

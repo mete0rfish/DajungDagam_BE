@@ -126,13 +126,15 @@ public class TradePostService {
         tradePostRepository.deleteById(id);
     }
 
+
+
     @Transactional
     public boolean deleteAllPost(User user) {
         int userId = user.getId();
         String kakaoName = user.getKakaoName();
 
         List<TradePost> tradePostList= this.getAllTradePostWithUserId(userId);
-        Wishlist wishlist = wishlistService.getWishlistByKakaoName(kakaoName);
+        Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
 
 
         for(TradePost tradePost : wishlist.getTradePosts()) {
@@ -150,5 +152,11 @@ public class TradePostService {
     }
 
 
+    public void reduceWishlistCount(TradePost target) {
+        target.setWishlistCount(target.getWishlistCount() - 1);
+    }
 
+    public void increaseWishlistCount(TradePost target) {
+        target.setWishlistCount(target.getWishlistCount() + 1);
+    }
 }

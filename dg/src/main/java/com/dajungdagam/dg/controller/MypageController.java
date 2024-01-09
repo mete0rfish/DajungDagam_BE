@@ -117,7 +117,7 @@ public class MypageController {
             }
 
             //
-            Wishlist wishlist = wishlistService.getWishlistByKakaoName(kakaoName);
+            Wishlist wishlist = wishlistService.getWishlistByUserId(user_id);
             wishlistResponseDto = new WishlistResponseDto(wishlist.getId(), wishlist.getTradePosts());
 
             HttpHeaders headers = new HttpHeaders();

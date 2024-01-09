@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,6 +28,10 @@ public class WishlistService {
     private UserJpaRepository userRepository;
     @Autowired
     private WishListJpaRepository wishlistRepository;
+
+    // 빈 순환 참조 뜨니까 사용 안함
+//    @Autowired
+//    private TradePostService tradePostService;
 
     public Wishlist addWishlist(String kakaoName){
         User user = userRepository.findByKakaoName(kakaoName);
@@ -68,6 +73,8 @@ public class WishlistService {
 
                 wishlist.addTradePost(tradePost);
                 wishlistRepository.save(wishlist);
+                // wishlistCount 증가
+                tradePost.setWishlistCount(tradePost.getWishlistCount() + 1);
 
                 log.info("wishlist의 tradeposts: " + wishlist.getTradePosts().toString());
 
@@ -98,11 +105,22 @@ public class WishlistService {
 
                 if(tradePost == null)    throw new Exception("wishlist is null");
                 List<TradePost> tradePosts = wishlist.getTradePosts();
-                tradePosts.stream().filter(post  -> {
-                    if(Objects.equals(post.getId(), postId)) return true;
-                    else return false;
-                })
-                        .toList().forEach(tradePosts::remove);
+
+                Iterator<TradePost> iter = tradePosts.iterator();
+                while(iter.hasNext()) {
+                    TradePost target = iter.next();
+                    if(target.getId().equals(postId)) {
+                        // wishlistCount 감소
+                        tradePost.setWishlistCount(tradePost.getWishlistCount() - 1);
+                        iter.remove();
+                    }
+                }
+
+//                tradePosts.stream().filter(post  -> {
+//                    if(Objects.equals(post.getId(), postId)) return true;
+//                    else return false;
+//                })
+//                        .toList().forEach(tradePosts::remove);
 
                 wishlistRepository.save(wishlist);
 
@@ -114,9 +132,11 @@ public class WishlistService {
         return wishlist;
     }
 
-    public Wishlist getWishlistByKakaoName(String kakaoName) {
-        User user = userRepository.findByKakaoName(kakaoName);
+    public Wishlist getWishlistByUserId(int userId) {
+        Optional<User> userObj = userRepository.findById(userId);
+        User user = userObj.get();
 
         return wishlistRepository.findByUser(user);
     }
+
 }

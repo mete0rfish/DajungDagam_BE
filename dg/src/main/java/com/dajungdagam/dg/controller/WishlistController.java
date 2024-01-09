@@ -25,6 +25,7 @@ public class WishlistController {
     @Autowired
     private UserService userService;
 
+    // 찜하기
     @PostMapping("/wishlist")
     public ResponseEntity<Wishlist> likes(@RequestBody WishlistDto wishlistDto) {
 
@@ -43,9 +44,12 @@ public class WishlistController {
         log.info("찜하기 성공");
         log.info("wishlist: " + wishlist.toString());
 
+        // wishlist Count 증가시키기
+
         return new ResponseEntity<>(wishlist, headers, HttpStatus.OK);
     }
 
+    // 찜 취소하기
     @DeleteMapping("/wishlist")
     public ResponseEntity<Wishlist> deletePost(Authentication authentication,
                                                @RequestParam int postCategory, @RequestParam Long postId){
@@ -59,6 +63,7 @@ public class WishlistController {
             log.info("찜목록 게시글 삭제됨.");
             log.info(wishlist.toString());
 
+
         } catch (Exception e){
             log.error(e.getMessage());
         }
@@ -68,13 +73,16 @@ public class WishlistController {
 
         log.info("wishlist: " + wishlist.toString());
 
+
+
+
         return new ResponseEntity<>(wishlist, headers, HttpStatus.OK);
 
     }
 
-    @PostMapping("/wishlist/{kakaoName}")
-    public ResponseEntity<Wishlist> getWishlistByUserId(@PathVariable("kakaoName") String kakaoName){
-        Wishlist wishlist = wishlistService.getWishlistByKakaoName(kakaoName);
+    @PostMapping("/wishlist/{userId}")
+    public ResponseEntity<Wishlist> getWishlistByUserId(@PathVariable("userId") int userId){
+        Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
