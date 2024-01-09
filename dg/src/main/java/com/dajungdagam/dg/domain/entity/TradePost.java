@@ -1,30 +1,35 @@
 package com.dajungdagam.dg.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
+@Setter
 @Entity
+@Table
+@ToString
 public class TradePost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
+    @Column(name = "tp_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
     private User user;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
     private Area area;
 
-    @Column(length = 50)
+    @Column(length = 50, name = "tp_title")
     private String title;
 
     @Enumerated(EnumType.STRING)
@@ -34,7 +39,7 @@ public class TradePost extends BaseEntity {
     @Column(length = 10, name = "trade_area")
     private String tradeArea;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", name = "tp_content")
     private String content;
 
     @Column(columnDefinition = "TIMESTAMP", name = "created_time")
@@ -57,10 +62,7 @@ public class TradePost extends BaseEntity {
     private TradeStatus tradeStatus;
 
     @Builder
-    public TradePost(Long id, User user, Area area, String title, PostType postType,
-                     String tradeArea, String content, LocalDateTime createdTime,
-                     LocalDateTime updateTime, Long viewCount, Long wishlistCount,
-                     String chatLink, TradeStatus tradeStatus) {
+    public TradePost(Long id, User user, Area area, String title, PostType postType, String tradeArea, String content, LocalDateTime createdTime, LocalDateTime updateTime, Long viewCount, Long wishlistCount, String chatLink, TradeStatus tradeStatus) {
         this.id = id;
         this.user = user;
         this.area = area;

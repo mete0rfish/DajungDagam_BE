@@ -1,13 +1,18 @@
 package com.dajungdagam.dg.service;
 
-import com.dajungdagam.dg.domain.entity.Area;
-import com.dajungdagam.dg.domain.entity.RoleType;
-import com.dajungdagam.dg.domain.entity.User;
+import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
+import com.dajungdagam.dg.jwt.RefreshToken;
 import com.dajungdagam.dg.jwt.jwtTokenProvider;
 import com.dajungdagam.dg.repository.AreaJpaRepository;
 import com.dajungdagam.dg.repository.UserJpaRepository;
+import com.dajungdagam.dg.repository.WishListJpaRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -26,7 +33,13 @@ public class UserService {
     private UserJpaRepository repository;
 
     @Autowired
+    private WishlistService wishlistService;
+
+    @Autowired
     private AreaJpaRepository areaRepository;
+
+    @Autowired
+    private TradePostService tradePostService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -61,16 +74,20 @@ public class UserService {
         return new UserResponseDto(user);
     }
 
+    // 회원가입 시, 찜목록 만들기
     @Transactional
     public int signUp(Map<String, Object> userInfo) {
         int id = 0;
         String kakaoName = (String)userInfo.get("kakaoName");
         log.info(kakaoName + " in userInfo.");
         try{
-            User user = new User(0, kakaoName, RoleType.USER);
+            User user = new User(kakaoName, RoleType.USER);
             log.info(user.getKakaoName() + " 가 저장되었습니다.");
             id = repository.save(user).getId();
 
+            Wishlist wishlist = wishlistService.addWishlist(user.getKakaoName());
+            log.info("새로운 회원 로그인 만들어짐.");
+            log.info("찜목록: " + wishlist.toString());
 
         } catch(Exception e){
             System.out.println(e);
@@ -87,7 +104,7 @@ public class UserService {
 
             User user = repository.findByKakaoName(kakaoName);
             if(user == null)
-                throw new Exception("닉네임을 변경할 유저의 정보가 없습니다.");
+                throw new Exception("유저의 정보가 없습니다.");
 
             user.setNickName(nickName);
 
@@ -111,7 +128,7 @@ public class UserService {
 
             UserResponseDto userResponseDto = findByUserKakaoNickName(kakaoName);
             if(userResponseDto.getUser() == null)
-                throw new Exception("닉네임을 변경할 유저의 정보가 없습니다.");
+                throw new Exception("유저의 정보가 없습니다.");
 
             User user = userResponseDto.getUser();
             Area area = areaRepository.findByGuNameAndDongName(gu, dong);
@@ -125,6 +142,51 @@ public class UserService {
 
         return id;
     }
+
+    @Transactional
+    public int updateUserInfo(String kakaoName, String info) {
+        int id = -1;
+        try{
+
+            UserResponseDto userResponseDto = findByUserKakaoNickName(kakaoName);
+            if(userResponseDto.getUser() == null)
+                throw new Exception("유저의 정보가 없습니다.");
+
+            User user = userResponseDto.getUser();
+            user.setInfo(info);
+
+            id = repository.save(user).getId();
+
+        } catch(Exception e){
+            e.getStackTrace();
+        }
+
+        return id;
+    }
+
+    @Transactional
+    public boolean deleteUser(UserResponseDto userResponseDto) {
+        try {
+            User user = userResponseDto.getUser();
+
+            boolean res = tradePostService.deleteAllPost(user);
+            if (!res) throw new Exception("User delete failed!");
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean isSameUser(int userId, UserResponseDto userResponseDto){
+        User user = userResponseDto.getUser();
+
+
+        return user.getId() == userId;
+    }
+
 
 
 }

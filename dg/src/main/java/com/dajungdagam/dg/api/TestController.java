@@ -1,7 +1,10 @@
 package com.dajungdagam.dg.api;
 
+import com.dajungdagam.dg.domain.dto.UserInfoResponseDto;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
@@ -38,7 +42,7 @@ public class TestController {
     // 카카오 로그인으로 nick 및 jwtToken 저장
     @ResponseBody
     @RequestMapping("/login/oauth2/code/kakao")
-    public ResponseEntity<?> kakaoLogin(@RequestParam String code) {
+    public ResponseEntity<?> kakaoLogin(@RequestParam String code, HttpSession session) {
         // 1. 인가 코드 받기
         log.info("eeeee");
 
@@ -60,11 +64,13 @@ public class TestController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-
-        // ~~ 확인용 ~~
         //String email = (String)userInfo.get("email");
         String kakaoName = userKakaoLoginResponseDto.getUser().getKakaoName();
         String jwtToken = userKakaoLoginResponseDto.getJwtToken();
+
+        // 6. 세션에 access Token 저장
+        session.setAttribute("accessToken", accessToken);
+        session.setAttribute("jwtToken", jwtToken);
 
         //System.out.println("email = " + email);
         log.info("kakaoName: " + kakaoName);
@@ -73,17 +79,12 @@ public class TestController {
         return new ResponseEntity<>(userKakaoLoginResponseDto, headers, userKakaoLoginResponseDto.getHttpStatus());
     }
 
-//    @RequestMapping(value = "/logout", method = RequestMethod.GET)
-//    private ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        HttpSession session = request.getSession(false);
-//        Cookie[] cookies = request.getCookies();
-//        boolean isValidJsessionid = false;
-//
-//        if(cookies != null && session != null){
-//            Optional<Cookie> jsessionCookie = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals(""))
-//        }
-//
-//    }
+    @RequestMapping(value = "/login/logout")
+    private ResponseEntity<String> logout(HttpSession session) throws IOException {
+        String accessToken = session.getAttribute("accessToken").toString();
+        kakaoApi.kakaoLogout(accessToken);
+        return ResponseEntity.ok("logouted!");
+    }
 
     @PostMapping("/login/details/v1")
     public ResponseEntity<String> loginDetailsNickName(@RequestParam String kakaoName, @RequestParam String nickName) {
@@ -108,5 +109,40 @@ public class TestController {
 
         log.info("id: " + id + " 유저의 사는 곳이 업데이트 됨.");
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/login/details/v3")
+    public ResponseEntity<String> loginDetailsInfo(@RequestParam String kakaoName, @RequestBody UserInfoResponseDto userInfoResponseDto) {
+
+        String info = userInfoResponseDto.getInfo();
+        int id = userService.updateUserInfo(kakaoName, info);
+
+        if (id == -1) {
+            return ResponseEntity.notFound().build();
+        }
+
+        log.info("id: " + id + " 유저의 소개글이 업데이트 됨.");
+        return ResponseEntity.ok().build();
+    }
+
+
+    // 현재 로그인한 유저인지 확인하는 코드 패스
+    @DeleteMapping("/login/delete")
+    public ResponseEntity<String> deleteUser(@RequestParam String kakaoName) {
+        UserResponseDto userResponseDto = null;
+        try{
+            userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+            if(userResponseDto == null) throw new Exception("user 정보가 없음");
+
+            boolean res = userService.deleteUser(userResponseDto);
+            if(!res) throw new Exception("회원 탈퇴 실패");
+
+            return ResponseEntity.ok().build();
+        } catch(Exception e) {
+            log.error(e.getMessage());
+
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 }

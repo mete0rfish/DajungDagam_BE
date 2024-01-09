@@ -2,9 +2,15 @@ package com.dajungdagam.dg.service;
 
 import com.dajungdagam.dg.domain.dto.TradePostDto;
 import com.dajungdagam.dg.domain.dto.TradePostSummaryDto;
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.entity.TradePost;
+import com.dajungdagam.dg.domain.entity.User;
+import com.dajungdagam.dg.domain.entity.Wishlist;
 import com.dajungdagam.dg.repository.TradePostRepository;
+import com.dajungdagam.dg.repository.WishListJpaRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,13 +18,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class TradePostService {
 
+    @Autowired
     private TradePostRepository tradePostRepository;
-
-    public TradePostService(TradePostRepository tradePostRepository) {
-        this.tradePostRepository = tradePostRepository;
-    }
+    @Autowired
+    private WishlistService wishlistService;
+    @Autowired
+    private WishListJpaRepository wishlistRepository;
 
     @Transactional
     public List<TradePostDto> searchPosts(String keyword) {
@@ -32,6 +40,35 @@ public class TradePostService {
         }
 
         return tradePostDtoList;
+    }
+
+    @Transactional
+    public List<TradePostDto> searchPostsByUserId(int userId) {
+        List<TradePost> tradePosts = tradePostRepository.findByUserId(userId);
+        List<TradePostDto> tradePostDtoList = new ArrayList<>();
+
+        if(tradePosts.isEmpty()){
+            log.info("tradePosts is Empty");
+            return tradePostDtoList;
+        }
+
+        for(TradePost tradePost : tradePosts){
+            tradePostDtoList.add(this.convertEntityToDto(tradePost));
+        }
+
+        return tradePostDtoList;
+    }
+
+    @Transactional
+    public List<TradePost> getAllTradePostWithUserId(int userId) {
+        List<TradePost> tradePosts = tradePostRepository.findAllByUserId(userId);
+
+        if(tradePosts.isEmpty()){
+            log.info("tradePosts is Empty");
+            return null;
+        }
+
+        return tradePosts;
     }
 
     private TradePostDto convertEntityToDto(TradePost tradePost) {
@@ -90,6 +127,7 @@ public class TradePostService {
         tradePostRepository.deleteById(id);
     }
 
+
     public List<TradePostSummaryDto> getLikePosts() {
         List<TradePost> likePosts = tradePostRepository.findTop3ByOrderByWishlistDesc();
         List<TradePostSummaryDto> summaryDtos = new ArrayList<>();
@@ -108,4 +146,30 @@ public class TradePostService {
         }
         return summaryDtos;
     }
+
+    @Transactional
+    public boolean deleteAllPost(User user) {
+        int userId = user.getId();
+        String kakaoName = user.getKakaoName();
+
+        List<TradePost> tradePostList= this.getAllTradePostWithUserId(userId);
+        Wishlist wishlist = wishlistService.getWishlistByKakaoName(kakaoName);
+
+
+        for(TradePost tradePost : wishlist.getTradePosts()) {
+            tradePostRepository.deleteById(tradePost.getId());
+        }
+
+        for(TradePost tradePost : tradePostList) {
+            tradePostRepository.deleteById(tradePost.getId());
+        }
+
+        wishlistRepository.deleteById(wishlist.getId());
+
+        tradePostList= this.getAllTradePostWithUserId(userId);
+        return tradePostList == null;
+    }
+
+
+
 }

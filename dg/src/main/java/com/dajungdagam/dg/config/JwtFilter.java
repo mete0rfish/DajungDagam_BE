@@ -64,10 +64,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Username Token에서 꺼내기
         String kakaoName = jwtTokenProvider.getUserName(token, secretKey);
+        System.out.println(" [ kakaoName ] : "+  kakaoName);
 
         // 권한 부여
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(kakaoName, null, List.of(new SimpleGrantedAuthority("USER")));
+
         // Detail 넣어주기
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
