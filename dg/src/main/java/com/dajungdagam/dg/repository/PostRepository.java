@@ -18,6 +18,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAllByUserId(int userId);
 
+    List<Post> findTop3ByOrderByWishlistCountDesc();
+
     @Modifying // 조회수 구현
     @Query("update Post p set p.viewCount = p.viewCount + 1 where p.id = :id")
     int updateviewCount(Long id);
