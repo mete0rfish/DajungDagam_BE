@@ -14,6 +14,10 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByTitleContaining(String keyword);
 
+    List<Post> findByUserId(int userId);
+
+    List<Post> findAllByUserId(int userId);
+
     @Modifying // 조회수 구현
     @Query("update Post p set p.viewCount = p.viewCount + 1 where p.id = :id")
     int updateviewCount(Long id);

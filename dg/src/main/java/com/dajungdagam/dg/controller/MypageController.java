@@ -5,6 +5,7 @@ import com.dajungdagam.dg.domain.dto.UserMypageInfoResponseDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.dto.WishlistResponseDto;
 import com.dajungdagam.dg.domain.entity.Wishlist;
+import com.dajungdagam.dg.service.PostService;
 import com.dajungdagam.dg.service.UserService;
 import com.dajungdagam.dg.service.WishlistService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class MypageController {
     private UserService userService;
 
     @Autowired
-    private TradePostService tradePostService;
+    private PostService postService;
 
     @Autowired
     private WishlistService wishlistService;
@@ -81,7 +82,7 @@ public class MypageController {
             }
 
             // kakao Name으로 받아오기
-            postDtoList = tradePostService.searchPostsByUserId(user_id);
+            postDtoList = postService.searchPostsByUserId(user_id);
             //model.addAttribute("TradePostList", tradePostDtoList);
 
             HttpHeaders headers = new HttpHeaders();

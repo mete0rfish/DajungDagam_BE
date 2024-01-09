@@ -31,7 +31,7 @@ public class UserService {
     private AreaJpaRepository areaRepository;
 
     @Autowired
-    private TradePostService tradePostService;
+    private PostService postService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -158,7 +158,7 @@ public class UserService {
             Optional<User> userObj = repository.findById(userId);
             User user = userObj.get();
 
-            boolean res = tradePostService.deleteAllPost(user);
+            boolean res = postService.deleteAllPost(user);
             if (!res) throw new Exception("User delete failed!");
 
         } catch (Exception e) {

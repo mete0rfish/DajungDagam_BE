@@ -1,13 +1,13 @@
 package com.dajungdagam.dg.service;
 
 import com.dajungdagam.dg.domain.dto.PostDto;
-import com.dajungdagam.dg.domain.entity.Image;
-import com.dajungdagam.dg.domain.entity.ItemCategory;
-import com.dajungdagam.dg.domain.entity.Post;
+import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.repository.ImageRepository;
 import com.dajungdagam.dg.repository.ItemCategoryRepository;
 import com.dajungdagam.dg.repository.PostRepository;
+import com.dajungdagam.dg.repository.WishListJpaRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,11 +25,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class PostService {
 
     private PostRepository postRepository;
     private ImageRepository imageRepository;
+
+
+    private WishlistService wishlistService;
+
+    private WishListJpaRepository wishlistRepository;
 
     private ItemCategoryRepository itemCategoryRepository;
 
@@ -37,12 +43,16 @@ public class PostService {
     private static final int PAGE_POST_COUNT = 9; // 한 페이지에 존재하는 게시글 수
 
     @Autowired
-     public PostService(PostRepository postRepository, ImageRepository imageRepository,
-                        ItemCategoryRepository itemCategoryRepository) {
+    public PostService(PostRepository postRepository, ImageRepository imageRepository, WishlistService wishlistService, WishListJpaRepository wishlistRepository, ItemCategoryRepository itemCategoryRepository) {
         this.postRepository = postRepository;
         this.imageRepository = imageRepository;
+        this.wishlistService = wishlistService;
+        this.wishlistRepository = wishlistRepository;
         this.itemCategoryRepository = itemCategoryRepository;
     }
+
+
+
 
     @Transactional
     public List<PostDto> searchPosts(String keyword) {
@@ -190,6 +200,8 @@ public class PostService {
         return postDtoList;
     }
 
+
+
     @Transactional
     public Integer[] getPageList(Integer curPageNum) {
          Integer[] pageList = new Integer[BLOCK_PAGE_NUM_COUNT];
@@ -277,6 +289,60 @@ public class PostService {
     public ItemCategory getItemCategoryById(Long id) {
         return itemCategoryRepository.findById(id).orElse(null);
     }
+
+
+    @Transactional
+    public List<Post> getAllTradePostWithUserId(int userId) {
+        List<Post> tradePosts = postRepository.findAllByUserId(userId);
+
+        if(tradePosts.isEmpty()){
+            log.info("tradePosts is Empty");
+            return null;
+        }
+
+        return tradePosts;
+    }
+
+    @Transactional
+    public boolean deleteAllPost(User user) {
+        int userId = user.getId();
+        String kakaoName = user.getKakaoName();
+
+        List<Post> tradePostList= this.getAllTradePostWithUserId(userId);
+        Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
+
+
+        for(Post tradePost : wishlist.getTradePosts()) {
+            postRepository.deleteById(tradePost.getId());
+        }
+
+        for(Post tradePost : tradePostList) {
+            postRepository.deleteById(tradePost.getId());
+        }
+
+        wishlistRepository.deleteById(wishlist.getId());
+
+        tradePostList= this.getAllTradePostWithUserId(userId);
+        return tradePostList == null;
+    }
+
+    @Transactional
+    public List<PostDto> searchPostsByUserId(int userId) {
+        List<Post> tradePosts = postRepository.findByUserId(userId);
+        List<PostDto> tradePostDtoList = new ArrayList<>();
+
+        if(tradePosts.isEmpty()){
+            log.info("tradePosts is Empty");
+            return tradePostDtoList;
+        }
+
+        for(Post tradePost : tradePosts){
+            tradePostDtoList.add(this.convertEntityToDto(tradePost));
+        }
+
+        return tradePostDtoList;
+    }
+
 
 //    // 공동구매 글 목록 조회
 //    public List<PostDto> getTradePosts() {
