@@ -1,18 +1,11 @@
 package com.dajungdagam.dg.service;
 
-import com.dajungdagam.dg.domain.dto.TradePostDto;
 import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
-import com.dajungdagam.dg.jwt.RefreshToken;
 import com.dajungdagam.dg.jwt.jwtTokenProvider;
 import com.dajungdagam.dg.repository.AreaJpaRepository;
 import com.dajungdagam.dg.repository.UserJpaRepository;
-import com.dajungdagam.dg.repository.WishListJpaRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,7 +31,7 @@ public class UserService {
     private AreaJpaRepository areaRepository;
 
     @Autowired
-    private TradePostService tradePostService;
+    private PostService postService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -167,7 +158,7 @@ public class UserService {
             Optional<User> userObj = repository.findById(userId);
             User user = userObj.get();
 
-            boolean res = tradePostService.deleteAllPost(user);
+            boolean res = postService.deleteAllPost(user);
             if (!res) throw new Exception("User delete failed!");
 
         } catch (Exception e) {

@@ -15,6 +15,7 @@ public class User {
 
     @Id
     @GeneratedValue
+    @Column(name = "user_id")
     private int id;
 
     @Column(unique = true, length = 40)

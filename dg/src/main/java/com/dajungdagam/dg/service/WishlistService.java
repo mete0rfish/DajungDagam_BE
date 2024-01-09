@@ -1,10 +1,10 @@
 package com.dajungdagam.dg.service;
 
 import com.dajungdagam.dg.domain.dto.WishlistDto;
-import com.dajungdagam.dg.domain.entity.TradePost;
+import com.dajungdagam.dg.domain.entity.Post;
 import com.dajungdagam.dg.domain.entity.User;
 import com.dajungdagam.dg.domain.entity.Wishlist;
-import com.dajungdagam.dg.repository.TradePostRepository;
+import com.dajungdagam.dg.repository.PostRepository;
 import com.dajungdagam.dg.repository.UserJpaRepository;
 import com.dajungdagam.dg.repository.WishListJpaRepository;
 import jakarta.transaction.Transactional;
@@ -14,16 +14,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class WishlistService {
 
     @Autowired
-    private TradePostRepository tradePostRepository;
+    private PostRepository postRepository;
     @Autowired
     private UserJpaRepository userRepository;
     @Autowired
@@ -65,8 +63,8 @@ public class WishlistService {
                 // 공동구매 아직 구현 X
 
             } else {
-                Optional<TradePost> tradePostObj = tradePostRepository.findById(postId);
-                TradePost tradePost = tradePostObj.get();
+                Optional<Post> tradePostObj = postRepository.findById(postId);
+                Post tradePost = tradePostObj.get();
                 log.info("TradePost: "+ tradePost.toString());
 
                 if(tradePost == null)    throw new Exception("wishlist is null");
@@ -100,15 +98,15 @@ public class WishlistService {
                 // 공동구매 아직 구현 X
 
             } else {
-                Optional<TradePost> tradePostObj = tradePostRepository.findById(postId);
-                TradePost tradePost = tradePostObj.get();
+                Optional<Post> tradePostObj = postRepository.findById(postId);
+                Post tradePost = tradePostObj.get();
 
                 if(tradePost == null)    throw new Exception("wishlist is null");
-                List<TradePost> tradePosts = wishlist.getTradePosts();
+                List<Post> tradePosts = wishlist.getTradePosts();
 
-                Iterator<TradePost> iter = tradePosts.iterator();
+                Iterator<Post> iter = tradePosts.iterator();
                 while(iter.hasNext()) {
-                    TradePost target = iter.next();
+                    Post target = iter.next();
                     if(target.getId().equals(postId)) {
                         // wishlistCount 감소
                         tradePost.setWishlistCount(tradePost.getWishlistCount() - 1);
