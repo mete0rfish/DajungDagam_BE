@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+
+<h1>게시글 목록 - 카테고리: <span th:text="${category.categoryName}"></span></h1>
+
+<ul>
+    <!-- 게시글 목록을 순회하면서 출력 -->
+    <li th:each="post : ${posts}">
+        <span th:text="${post.title}"></span>
+
+        <span th:text="${post.content}"></span>
+    </li>
+</ul>
+
+</body>
+</html>
