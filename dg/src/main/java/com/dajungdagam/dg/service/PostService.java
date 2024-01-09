@@ -1,6 +1,7 @@
 package com.dajungdagam.dg.service;
 
 import com.dajungdagam.dg.domain.dto.PostDto;
+import com.dajungdagam.dg.domain.dto.TradePostSummaryDto;
 import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.repository.ImageRepository;
 import com.dajungdagam.dg.repository.ItemCategoryRepository;
@@ -341,6 +342,25 @@ public class PostService {
         }
 
         return tradePostDtoList;
+    }
+
+    public List<TradePostSummaryDto> getLikePosts() {
+        List<Post> likePosts = postRepository.findTop3ByOrderByWishlistCountDesc();
+        List<TradePostSummaryDto> summaryDtos = new ArrayList<>();
+        for (Post likePost : likePosts) {
+            TradePostSummaryDto tradePostSummaryDto = TradePostSummaryDto.builder()
+                    .id(likePost.getId())
+                    .user(likePost.getUser())
+                    .title(likePost.getTitle())
+                    .tradeArea(likePost.getTradeArea())
+                    .content(likePost.getContent())
+                    .viewCount(likePost.getViewCount())
+                    .wishlistCount(likePost.getWishlistCount())
+                    .tradeStatus(likePost.getTradeStatus())
+                    .build();
+            summaryDtos.add(tradePostSummaryDto);
+        }
+        return summaryDtos;
     }
 
 
