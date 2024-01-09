@@ -1,13 +1,12 @@
 package com.dajungdagam.dg.service;
 
-import com.dajungdagam.dg.domain.dto.ImageDto;
-import com.dajungdagam.dg.domain.dto.TradePostDto;
+import com.dajungdagam.dg.domain.dto.PostDto;
 import com.dajungdagam.dg.domain.entity.Image;
 import com.dajungdagam.dg.domain.entity.ItemCategory;
-import com.dajungdagam.dg.domain.entity.TradePost;
+import com.dajungdagam.dg.domain.entity.Post;
 import com.dajungdagam.dg.repository.ImageRepository;
 import com.dajungdagam.dg.repository.ItemCategoryRepository;
-import com.dajungdagam.dg.repository.TradePostRepository;
+import com.dajungdagam.dg.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,17 +20,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class TradePostService {
+public class PostService {
 
-    private TradePostRepository tradePostRepository;
+    private PostRepository postRepository;
     private ImageRepository imageRepository;
 
     private ItemCategoryRepository itemCategoryRepository;
@@ -40,42 +37,42 @@ public class TradePostService {
     private static final int PAGE_POST_COUNT = 9; // 한 페이지에 존재하는 게시글 수
 
     @Autowired
-     public TradePostService(TradePostRepository tradePostRepository, ImageRepository imageRepository,
-                             ItemCategoryRepository itemCategoryRepository) {
-        this.tradePostRepository = tradePostRepository;
+     public PostService(PostRepository postRepository, ImageRepository imageRepository,
+                        ItemCategoryRepository itemCategoryRepository) {
+        this.postRepository = postRepository;
         this.imageRepository = imageRepository;
         this.itemCategoryRepository = itemCategoryRepository;
     }
 
     @Transactional
-    public List<TradePostDto> searchPosts(String keyword) {
-        List<TradePost> tradePosts = tradePostRepository.findByTitleContaining(keyword);
-        List<TradePostDto> tradePostDtoList = new ArrayList<>();
+    public List<PostDto> searchPosts(String keyword) {
+        List<Post> posts = postRepository.findByTitleContaining(keyword);
+        List<PostDto> postDtoList = new ArrayList<>();
 
-        if (tradePosts.isEmpty()) return tradePostDtoList;
+        if (posts.isEmpty()) return postDtoList;
 
-        for (TradePost tradePost : tradePosts) {
-            tradePostDtoList.add(this.convertEntityToDto(tradePost));
+        for (Post post : posts) {
+            postDtoList.add(this.convertEntityToDto(post));
         }
 
-        return tradePostDtoList;
+        return postDtoList;
     }
 
-    private TradePostDto convertEntityToDto(TradePost tradePost) {
-        return TradePostDto.builder()
-                .id(tradePost.getId())
-                .user(tradePost.getUser())
-                .title(tradePost.getTitle())
-                .postType(tradePost.getPostType())
-                .tradeArea(tradePost.getTradeArea())
-                .content(tradePost.getContent())
-                .createdTime(tradePost.getCreatedTime())
-                .updateTime(tradePost.getUpdateTime())
-                .viewCount(tradePost.getViewCount())
-                .wishlistCount(tradePost.getWishlistCount())
-                .chatLink(tradePost.getChatLink())
-                .tradeStatus(tradePost.getTradeStatus())
-                .itemCategory(tradePost.getItemCategory())
+    private PostDto convertEntityToDto(Post post) {
+        return PostDto.builder()
+                .id(post.getId())
+                .user(post.getUser())
+                .title(post.getTitle())
+                .postType(post.getPostType())
+                .tradeArea(post.getTradeArea())
+                .content(post.getContent())
+                .createdTime(post.getCreatedTime())
+                .updateTime(post.getUpdateTime())
+                .viewCount(post.getViewCount())
+                .wishlistCount(post.getWishlistCount())
+                .chatLink(post.getChatLink())
+                .tradeStatus(post.getTradeStatus())
+                .itemCategory(post.getItemCategory())
                 .build();
     }
 
@@ -83,7 +80,7 @@ public class TradePostService {
     private final String imagePath = "/Users/choehyeontae/Desktop/images/";
 
     @Transactional // 게시글 작성 이미지 업로드 기능 추가
-    public void savePost(TradePostDto tradePostDto, MultipartFile[] images) throws IOException {
+    public void savePost(PostDto postDto, MultipartFile[] images) throws IOException {
 
          Path uploadPath = Paths.get(imagePath);
 
@@ -98,8 +95,8 @@ public class TradePostService {
          }
 
          // 게시글 DB에 저장 후 pk을 받아옴
-         Long id = tradePostRepository.save(tradePostDto.toEntity()).getId();
-         TradePost tradePost = tradePostRepository.findById(id).get();
+         Long id = postRepository.save(postDto.toEntity()).getId();
+         Post post = postRepository.findById(id).get();
          if (images != null && images.length > 0) {
 
              // 최소 하나의 이미지를 업로드하도록 검증
@@ -146,7 +143,7 @@ public class TradePostService {
                              .uuid(uuid)
                              .imageType(formatType)
                              .imageSize(image.getSize())
-                             .tradePost(tradePost)
+                             .post(post)
                              .build();
 
                      imageRepository.save(image1);
@@ -157,40 +154,40 @@ public class TradePostService {
 
      }
 
-    public List<Image> getImagesByTradePost(TradePost tradePost) {
-        return imageRepository.findByTradePost(tradePost);
+    public List<Image> getImagesByTradePost(Post post) {
+        return imageRepository.findByPost(post);
     }
 
     @Transactional
-    public List<TradePostDto> getPostlist(Integer pageNum) {
+    public List<PostDto> getPostlist(Integer pageNum) {
 
-         Page<TradePost> page = tradePostRepository
+         Page<Post> page = postRepository
                  .findAll(PageRequest.of(pageNum-1, PAGE_POST_COUNT,
                          Sort.by(Sort.Direction.ASC, "createdTime")));
 
-        List<TradePost> tradePosts = page.getContent();
-        List<TradePostDto> tradePostDtoList = new ArrayList<>();
+        List<Post> posts = page.getContent();
+        List<PostDto> postDtoList = new ArrayList<>();
 
-        for (TradePost tradePost : tradePosts) {
-            TradePostDto tradePostDto = TradePostDto.builder()
-                    .id(tradePost.getId())
-                    .user(tradePost.getUser())
-                    .title(tradePost.getTitle())
-                    .postType(tradePost.getPostType())
-                    .tradeArea(tradePost.getTradeArea())
-                    .content(tradePost.getContent())
-                    .createdTime(tradePost.getCreatedTime())
-                    .updateTime(tradePost.getUpdateTime())
-                    .viewCount(tradePost.getViewCount())
-                    .wishlistCount(tradePost.getWishlistCount())
-                    .chatLink(tradePost.getChatLink())
-                    .tradeStatus(tradePost.getTradeStatus())
-                    .itemCategory(tradePost.getItemCategory())
+        for (Post post : posts) {
+            PostDto postDto = PostDto.builder()
+                    .id(post.getId())
+                    .user(post.getUser())
+                    .title(post.getTitle())
+                    .postType(post.getPostType())
+                    .tradeArea(post.getTradeArea())
+                    .content(post.getContent())
+                    .createdTime(post.getCreatedTime())
+                    .updateTime(post.getUpdateTime())
+                    .viewCount(post.getViewCount())
+                    .wishlistCount(post.getWishlistCount())
+                    .chatLink(post.getChatLink())
+                    .tradeStatus(post.getTradeStatus())
+                    .itemCategory(post.getItemCategory())
                     .build();
-            tradePostDtoList.add(tradePostDto);
+            postDtoList.add(postDto);
         }
 
-        return tradePostDtoList;
+        return postDtoList;
     }
 
     @Transactional
@@ -221,47 +218,47 @@ public class TradePostService {
 
     @Transactional
     public Long getPostCount() {
-         return tradePostRepository.count();
+         return postRepository.count();
     }
 
     @Transactional
-    public TradePostDto getPost(Long id) {
-        Optional<TradePost> tradePostWrapper = tradePostRepository.findById(id);
-        TradePost tradePost = tradePostWrapper.get();
+    public PostDto getPost(Long id) {
+        Optional<Post> tradePostWrapper = postRepository.findById(id);
+        Post post = tradePostWrapper.get();
 
-        TradePostDto tradePostDto = TradePostDto.builder()
-                .id(tradePost.getId())
-                .user(tradePost.getUser())
-                .title(tradePost.getTitle())
-                .postType(tradePost.getPostType())
-                .tradeArea(tradePost.getTradeArea())
-                .content(tradePost.getContent())
-                .createdTime(tradePost.getCreatedTime())
-                .updateTime(tradePost.getUpdateTime())
-                .viewCount(tradePost.getViewCount())
-                .wishlistCount(tradePost.getWishlistCount())
-                .chatLink(tradePost.getChatLink())
-                .tradeStatus(tradePost.getTradeStatus())
-                .itemCategory(tradePost.getItemCategory())
+        PostDto postDto = PostDto.builder()
+                .id(post.getId())
+                .user(post.getUser())
+                .title(post.getTitle())
+                .postType(post.getPostType())
+                .tradeArea(post.getTradeArea())
+                .content(post.getContent())
+                .createdTime(post.getCreatedTime())
+                .updateTime(post.getUpdateTime())
+                .viewCount(post.getViewCount())
+                .wishlistCount(post.getWishlistCount())
+                .chatLink(post.getChatLink())
+                .tradeStatus(post.getTradeStatus())
+                .itemCategory(post.getItemCategory())
                 .build();
 
-        return tradePostDto;
+        return postDto;
     }
 
     @Transactional // 게시물 수정
-    public void updatePost(TradePostDto tradePostDto) {
-        tradePostRepository.save(tradePostDto.toEntity()).getId();
+    public void updatePost(PostDto postDto) {
+        postRepository.save(postDto.toEntity()).getId();
     }
 
     @Transactional // 게시물 삭제
     public void deletePost(Long id) {
-        tradePostRepository.deleteById(id);
+        postRepository.deleteById(id);
     }
 
 
     @Transactional // 조회수 기능
     public int updateView(Long id) {
-        return tradePostRepository.updateviewCount(id);
+        return postRepository.updateviewCount(id);
     }
 
 //    @Transactional // 게시글 수정 시 파일 삭제 기능 (일단 보류)
@@ -271,8 +268,8 @@ public class TradePostService {
 
     // 해당 카테고리에 속한 게시글 검색
     @Transactional
-    public List<TradePost> getTradePostsByCategory(ItemCategory itemCategory) {
-        return tradePostRepository.findByItemCategory(itemCategory);
+    public List<PostDto> getTradePostsByCategory(ItemCategory itemCategory) {
+        return postRepository.findByItemCategory(itemCategory);
     }
 
     // 해당 ID에 해당하는 카테고리 조회
@@ -280,5 +277,15 @@ public class TradePostService {
     public ItemCategory getItemCategoryById(Long id) {
         return itemCategoryRepository.findById(id).orElse(null);
     }
+
+//    // 공동구매 글 목록 조회
+//    public List<PostDto> getTradePosts() {
+//        return postRepository.findByType(0);
+//    }
+//
+//    // 물품거래 글 목록 조회
+//    public List<PostDto> getGroupbuyingPosts() {
+//        return postRepository.findByType(1);
+//    }
 }
 

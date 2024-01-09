@@ -3,22 +3,20 @@ package com.dajungdagam.dg.domain.dto;
 
 import com.dajungdagam.dg.domain.entity.*;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.*;
-import java.util.List;
 
 @Getter
 @Setter // Setter랑 ToString 없으면 DB 내에 저장이 안되더라.
 @ToString
 @NoArgsConstructor
-public class TradePostDto {
+public class PostDto {
 
     private Long id;
     private User user;
     private Area area;
     private String title;
-    private PostType postType;
+    private int postType;
     private String tradeArea;
     private String content;
     private LocalDateTime createdTime;
@@ -29,8 +27,8 @@ public class TradePostDto {
     private TradeStatus tradeStatus;
     private ItemCategory itemCategory;
 
-    public TradePost toEntity() {
-        return TradePost.builder()
+    public Post toEntity() {
+        return Post.builder()
                 .id(id)
                 .user(user)
                 .area(area)
@@ -49,10 +47,10 @@ public class TradePostDto {
     }
 
     @Builder
-    public TradePostDto(Long id, User user, Area area, String title, PostType postType,
-                        String tradeArea, String content, LocalDateTime createdTime,
-                        LocalDateTime updateTime, int viewCount, Long wishlistCount,
-                        String chatLink, TradeStatus tradeStatus, ItemCategory itemCategory)
+    public PostDto(Long id, User user, Area area, String title, int postType,
+                   String tradeArea, String content, LocalDateTime createdTime,
+                   LocalDateTime updateTime, int viewCount, Long wishlistCount,
+                   String chatLink, TradeStatus tradeStatus, ItemCategory itemCategory)
     {
         this.id = id;
         this.user = user;

@@ -14,7 +14,7 @@ public class ImageDto {
     private String uuid;
     private String imageType;
     private Long imageSize;
-    private TradePost tradePost;
+    private Post post;
 
 
 
@@ -25,20 +25,20 @@ public class ImageDto {
                 .uuid(uuid)
                 .imageType(imageType)
                 .imageSize(imageSize)
-                .tradePost(tradePost)
+                .post(post)
                 .build();
     }
 
     @Builder
     public ImageDto(String imagePath, String imageName, String uuid,
-                    String imageType, Long imageSize, TradePost tradePost)
+                    String imageType, Long imageSize, Post post)
     {
         this.imagePath = imagePath;
         this.imageName = imageName;
         this.uuid = uuid;
         this.imageType = imageType;
         this.imageSize = imageSize;
-        this.tradePost = tradePost;
+        this.post = post;
     }
 
 

@@ -27,19 +27,18 @@ public class Image {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private TradePost tradePost;
-
+    private Post post;
 
     @Builder
     public Image(Long id, String imagePath, String imageName, String uuid,
-                 String imageType, Long imageSize, TradePost tradePost) {
+                 String imageType, Long imageSize, Post post) {
         this.id = id;
         this.imagePath = imagePath;
         this.imageName = imageName;
         this.uuid = uuid;
         this.imageType = imageType;
         this.imageSize = imageSize;
-        this.tradePost = tradePost;
+        this.post = post;
     }
 
 }

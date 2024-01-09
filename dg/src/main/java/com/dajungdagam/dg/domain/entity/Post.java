@@ -16,17 +16,13 @@ import java.util.List;
 @Entity
 @DynamicUpdate
 @DynamicInsert
-@Table(name = "trade_post")
-public class TradePost extends BaseEntity {
+@Table(name = "post")
+public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
-
-//    @ManyToOne
-//    @JoinColumn(name = "item_id")
-//    private Item item;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -39,9 +35,8 @@ public class TradePost extends BaseEntity {
     @Column(length = 50)
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "post_type")
-    private PostType postType;
+    @Column(name = "post_type", nullable = false)
+    private int postType;
 
     @Column(length = 10, name = "trade_area")
     private String tradeArea;
@@ -68,7 +63,7 @@ public class TradePost extends BaseEntity {
     @Column(name = "trade_status")
     private TradeStatus tradeStatus;
 
-    @OneToMany(mappedBy = "tradePost", cascade = CascadeType.ALL, //orphanRemoval = true,
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, //orphanRemoval = true,
                 fetch = FetchType.LAZY)
     private List<Image> images = new ArrayList<>();
 
@@ -76,12 +71,12 @@ public class TradePost extends BaseEntity {
     @JoinColumn(name = "item_category_id")
     private ItemCategory itemCategory;
 
-
     @Builder
-    public TradePost(Long id, User user, Area area, String title, PostType postType,
-                     String tradeArea, String content, LocalDateTime createdTime,
-                     LocalDateTime updateTime, int viewCount, Long wishlistCount,
-                     String chatLink, TradeStatus tradeStatus, List<Image> images, ItemCategory itemCategory) {
+    public Post(Long id, User user, Area area, String title, int postType,
+                String tradeArea, String content, LocalDateTime createdTime,
+                LocalDateTime updateTime, int viewCount, Long wishlistCount,
+                String chatLink, TradeStatus tradeStatus, List<Image> images,
+                ItemCategory itemCategory) {
         this.id = id;
         this.user = user;
         this.area = area;
