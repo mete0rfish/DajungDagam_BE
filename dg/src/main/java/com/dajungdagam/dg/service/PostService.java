@@ -88,7 +88,7 @@ public class PostService {
     }
 
     // 절대 경로임. Mac 기준 경로임을 유의
-    private final String imagePath = "/Users/choehyeontae/Desktop/images/";
+    private final String imagePath = "F:\\";
 
     @Transactional // 게시글 작성 이미지 업로드 기능 추가
     public void savePost(PostDto postDto, MultipartFile[] images) throws IOException {
@@ -307,21 +307,22 @@ public class PostService {
     @Transactional
     public boolean deleteAllPost(User user) {
         int userId = user.getId();
-        String kakaoName = user.getKakaoName();
 
         List<Post> tradePostList= this.getAllTradePostWithUserId(userId);
         Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
 
+        if(tradePostList == null)
+            return true;
 
+        // 찜목록 삭제
         for(Post tradePost : wishlist.getTradePosts()) {
             postRepository.deleteById(tradePost.getId());
         }
 
+        // 작성글 삭제
         for(Post tradePost : tradePostList) {
             postRepository.deleteById(tradePost.getId());
         }
-
-        wishlistRepository.deleteById(wishlist.getId());
 
         tradePostList= this.getAllTradePostWithUserId(userId);
         return tradePostList == null;

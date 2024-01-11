@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -89,54 +90,109 @@ public class TestController {
 
     // 변경 완료
     @PostMapping("/login/details/v1")
-    public ResponseEntity<String> loginDetailsNickName(@RequestParam int userId, @RequestParam String nickName) {
-        log.info("requestParam됨. " + userId + " " + nickName);
-        int id = userService.updateUserNickName(userId, nickName);
+    public ResponseEntity<String> loginDetailsNickName(Authentication authentication, @RequestParam int userId, @RequestParam String nickName) {
 
-        if (id == -1) {
+        try {
+            if(authentication == null)
+                throw new Exception("authentication is null. non user Info");
+
+            String kakaoName = authentication.getName();
+            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+
+            int id = userService.updateUserNickName(userResponseDto, userId, nickName);
+
+            if (id == -1) {
+                throw new Exception("권한이 없습니다.");
+            }
+
+            log.info("id: " + id + " 유저의 별명이 업데이트 됨.");
+            return ResponseEntity.ok().body("유저 별명이 업데이트 됨.");
+
+        }catch(Exception e){
+            log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
 
-        log.info("id: " + id + " 유저의 별명이 업데이트 됨.");
-        return ResponseEntity.ok().build();
+
+        //log.info("requestParam됨. " + userId + " " + nickName);
+
     }
 
     // 변경 완료
     @PostMapping("/login/details/v2")
-    public ResponseEntity<String> loginDetailsArea(@RequestParam int userId, @RequestParam String gu_name, @RequestParam String dong_name) {
-        int id = userService.updateUserArea(userId, gu_name, dong_name);
+    public ResponseEntity<String> loginDetailsArea(Authentication authentication, @RequestParam int userId, @RequestParam String gu_name, @RequestParam String dong_name) {
+        try{
+            if(authentication == null)
+                throw new Exception("authentication is null. non user Info");
 
-        if (id == -1) {
+            String kakaoName = authentication.getName();
+            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+
+            int id = userService.updateUserArea(userResponseDto, userId, gu_name, dong_name);
+
+            if (id == -1) {
+                return ResponseEntity.notFound().build();
+            }
+
+            log.info("id: " + id + " 유저의 사는 곳이 업데이트 됨.");
+            return ResponseEntity.ok().body("유저 사는 곳 업데이트됨.");
+
+        } catch(Exception e){
+            log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
 
-        log.info("id: " + id + " 유저의 사는 곳이 업데이트 됨.");
-        return ResponseEntity.ok().build();
+
+
+
     }
 
-    // 변경 완료
+    //
     @PostMapping("/login/details/v3")
-    public ResponseEntity<String> loginDetailsInfo(@RequestParam int userId, @RequestBody UserInfoResponseDto userInfoResponseDto) {
+    public ResponseEntity<String> loginDetailsInfo(Authentication authentication, @RequestParam int userId, @RequestBody UserInfoResponseDto userInfoResponseDto) {
 
-        String info = userInfoResponseDto.getInfo();
-        int id = userService.updateUserInfo(userId, info);
+        try{
+            if(authentication == null)
+                throw new Exception("authentication is null. non user Info");
 
-        if (id == -1) {
+            String kakaoName = authentication.getName();
+            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+
+            String info = userInfoResponseDto.getInfo();
+            int id = userService.updateUserInfo(userResponseDto, userId, info);
+
+            if (id == -1) {
+                return ResponseEntity.notFound().build();
+            }
+            log.info("id: " + id + " 유저의 소개글이 업데이트 됨.");
+            return ResponseEntity.ok().body("유저 소개글 업데이트 됨.");
+
+        } catch(Exception e){
+            log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
 
-        log.info("id: " + id + " 유저의 소개글이 업데이트 됨.");
-        return ResponseEntity.ok().build();
+
+
+
+
+
     }
 
 
     // 현재 로그인한 유저인지 확인하는 코드 패스
     // 변경 완료
     @DeleteMapping("/login/delete")
-    public ResponseEntity<String> deleteUser(@RequestParam int userId) {
+    public ResponseEntity<String> deleteUser(Authentication authentication, @RequestParam int userId) {
 
     try{
-        boolean res = userService.deleteUser(userId);
+        if(authentication == null)
+            throw new Exception("authentication is null. non user Info");
+
+        String kakaoName = authentication.getName();
+        UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+
+        boolean res = userService.deleteUser(userResponseDto, userId);
 
         if(!res)    throw new Exception("회원 탈퇴 실패");
 
