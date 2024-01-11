@@ -64,7 +64,7 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "integer default 0", name = "view_count")
     private int viewCount;
 
-    @Column(columnDefinition = "BIGINT", name = "wishlist_count")
+    @Column(columnDefinition = "integer default 0", name = "wishlist_count")
     private Long wishlistCount;
 
     @Column(columnDefinition = "TEXT", name = "chat_link")

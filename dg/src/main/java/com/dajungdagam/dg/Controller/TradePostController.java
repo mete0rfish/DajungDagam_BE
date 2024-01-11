@@ -1,4 +1,4 @@
-package com.dajungdagam.dg.controller;
+package com.dajungdagam.dg.Controller;
 
 
 
@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-@Controller
+@RestController
 @Slf4j
 public class TradePostController {
 
@@ -71,8 +72,8 @@ public class TradePostController {
         //return new TradePostSummaryDto();
     }
 
-    @PostMapping(value = "/trade/posts",  consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String write(@RequestBody PostDto postDto, Authentication authentication, @RequestParam MultipartFile[] images) throws IOException {
+    @PostMapping(value = "/trade/posts")
+    public ResponseEntity<String> write(PostDto postDto, Authentication authentication, @RequestPart MultipartFile[] images) throws IOException {
         log.info("title: " + postDto.getTitle() + " , content : " + postDto.getContent());
         try {
             if(authentication == null)
@@ -88,7 +89,7 @@ public class TradePostController {
             postService.savePost(postDto, images);
         }
 
-        return "redirect:/";
+        return ResponseEntity.ok().body("dasdsada");
     }
 
     @GetMapping("/trade/posts/{id}")

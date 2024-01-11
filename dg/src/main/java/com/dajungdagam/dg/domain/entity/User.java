@@ -1,5 +1,6 @@
 package com.dajungdagam.dg.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -32,6 +33,7 @@ public class User {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="area_id")
+    @JsonIgnore
     private Area area;
 
     @Column
