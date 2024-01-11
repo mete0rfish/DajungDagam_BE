@@ -165,13 +165,20 @@ public class UserService {
     public boolean deleteUser(UserResponseDto userResponseDto, int userId) {
         try {
             Optional<User> userObj = repository.findById(userId);
+            log.info("userObj: " + userObj.toString());
             User user = userObj.get();
+
 
             // 요청 보낸 유저와 같은지 체크
             if(!isSameUser(userId, userResponseDto))   throw new Exception("권한이 없습니다.");
 
             boolean res = postService.deleteAllPost(user);
-            if (!res) throw new Exception("User delete failed!");
+            Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
+
+            repository.deleteById(userId);
+            wishlistService.deleteWishlistTable(wishlist);
+
+        if (!res) throw new Exception("User delete failed!");
 
         } catch (Exception e) {
             log.error(e.getMessage());

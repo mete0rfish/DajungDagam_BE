@@ -147,7 +147,7 @@ public class TestController {
 
     }
 
-    // 변경 완료
+    //
     @PostMapping("/login/details/v3")
     public ResponseEntity<String> loginDetailsInfo(Authentication authentication, @RequestParam int userId, @RequestBody UserInfoResponseDto userInfoResponseDto) {
 

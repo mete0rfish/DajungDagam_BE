@@ -307,21 +307,22 @@ public class PostService {
     @Transactional
     public boolean deleteAllPost(User user) {
         int userId = user.getId();
-        String kakaoName = user.getKakaoName();
 
         List<Post> tradePostList= this.getAllTradePostWithUserId(userId);
         Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
 
+        if(tradePostList == null)
+            return true;
 
+        // 찜목록 삭제
         for(Post tradePost : wishlist.getTradePosts()) {
             postRepository.deleteById(tradePost.getId());
         }
 
+        // 작성글 삭제
         for(Post tradePost : tradePostList) {
             postRepository.deleteById(tradePost.getId());
         }
-
-        wishlistRepository.deleteById(wishlist.getId());
 
         tradePostList= this.getAllTradePostWithUserId(userId);
         return tradePostList == null;
