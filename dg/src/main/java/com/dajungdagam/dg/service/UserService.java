@@ -204,6 +204,12 @@ public class UserService {
         return user.getId() == userId;
     }
 
+    public static boolean isSameUser(UserResponseDto authUserResponseDto, UserResponseDto wishlistResponseDto) {
+        User authUser = authUserResponseDto.getUser();
+        User wishUser = wishlistResponseDto.getUser();
+
+        return authUser.getId() == wishUser.getId();
+    }
 
 
 }
