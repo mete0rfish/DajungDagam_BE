@@ -7,6 +7,7 @@ import com.dajungdagam.dg.repository.ImageRepository;
 import com.dajungdagam.dg.repository.ItemCategoryRepository;
 import com.dajungdagam.dg.repository.PostRepository;
 import com.dajungdagam.dg.repository.WishListJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -86,6 +88,7 @@ public class PostService {
                 .itemCategory(post.getItemCategory())
                 .build();
     }
+
 
     // 절대 경로임. Mac 기준 경로임을 유의
     private final String imagePath = "/Users/choehyeontae/Desktop/images/";
@@ -170,13 +173,11 @@ public class PostService {
     }
 
     @Transactional
-    public List<PostDto> getPostlist(Integer pageNum) {
+    public List<PostDto> getPostlist() {
 
-         Page<Post> page = postRepository
-                 .findAll(PageRequest.of(pageNum-1, PAGE_POST_COUNT,
-                         Sort.by(Sort.Direction.ASC, "createdTime")));
+        List<Post> posts = postRepository
+                .findAll(Sort.by(Sort.Direction.ASC, "createdTime"));
 
-        List<Post> posts = page.getContent();
         List<PostDto> postDtoList = new ArrayList<>();
 
         for (Post post : posts) {
@@ -200,8 +201,6 @@ public class PostService {
 
         return postDtoList;
     }
-
-
 
     @Transactional
     public Integer[] getPageList(Integer curPageNum) {
@@ -274,24 +273,6 @@ public class PostService {
         return postRepository.updateviewCount(id);
     }
 
-//    @Transactional // 게시글 수정 시 파일 삭제 기능 (일단 보류)
-//    public void deleteImage(Long id) {
-//        imageRepository.deleteById(id);
-//    }
-
-    // 해당 카테고리에 속한 게시글 검색
-    @Transactional
-    public List<PostDto> getTradePostsByCategory(ItemCategory itemCategory) {
-        return postRepository.findByItemCategory(itemCategory);
-    }
-
-    // 해당 ID에 해당하는 카테고리 조회
-    @Transactional
-    public ItemCategory getItemCategoryById(Long id) {
-        return itemCategoryRepository.findById(id).orElse(null);
-    }
-
-
     @Transactional
     public List<Post> getAllTradePostWithUserId(int userId) {
         List<Post> tradePosts = postRepository.findAllByUserId(userId);
@@ -363,15 +344,38 @@ public class PostService {
         return summaryDtos;
     }
 
+    @Transactional
+    public List<PostDto> getPostsByStatus(TradeStatus tradeStatus) {
+        List<Post> postList = postRepository.findByTradeStatus(tradeStatus);
+        return postList.stream()
+                .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
+                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
+                        post.getTradeStatus(), post.getItemCategory()))
+                .collect(Collectors.toList());
+    }
 
-//    // 공동구매 글 목록 조회
-//    public List<PostDto> getTradePosts() {
-//        return postRepository.findByType(0);
-//    }
-//
-//    // 물품거래 글 목록 조회
-//    public List<PostDto> getGroupbuyingPosts() {
-//        return postRepository.findByType(1);
-//    }
+    @Transactional
+    public List<PostDto> getPostsByCategory(ItemCategory itemCategory) {
+        List<Post> postsInCategory = postRepository.findByItemCategory(itemCategory);
+        return postsInCategory.stream()
+                .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
+                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
+                        post.getTradeStatus(), post.getItemCategory()))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<PostDto> getPostsByArea(Area area) {
+        List<Post> postsInArea = postRepository.findByArea(area);
+        return postsInArea.stream()
+                .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
+                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
+                        post.getTradeStatus(), post.getItemCategory()))
+                .collect(Collectors.toList());
+    }
+
 }
 
