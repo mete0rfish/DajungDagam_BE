@@ -2,6 +2,7 @@ package com.dajungdagam.dg.domain.dto;
 
 
 import com.dajungdagam.dg.domain.entity.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.time.*;
@@ -12,23 +13,26 @@ import java.time.*;
 @NoArgsConstructor
 public class PostDto {
 
-    private Long id;
-    private User user;
-    private Area area;
-    private String title;
-    private int postType;
-    private String tradeArea;
-    private String content;
-    private LocalDateTime createdTime;
-    private LocalDateTime updateTime;
-    private int viewCount;
-    private Long wishlistCount;
-    private String chatLink;
-    private TradeStatus tradeStatus;
+    public Long id;
 
-    private Wishlist wishlist;
+    @JsonIgnore
+    public User user;
+    public Area area;
+    public String title;
+    public int postType;
+    public String tradeArea;
+    public String content;
+    public LocalDateTime createdTime;
+    public LocalDateTime updateTime;
+    public int viewCount;
+    public Long wishlistCount;
+    public String chatLink;
+    public TradeStatus tradeStatus;
 
-    private ItemCategory itemCategory;
+    public Wishlist wishlist;
+
+
+    public ItemCategory itemCategory;
 
 
     public Post toEntity() {
@@ -51,7 +55,6 @@ public class PostDto {
     }
 
     @Builder
-
     public PostDto(Long id, User user, Area area, String title, int postType,
                    String tradeArea, String content, LocalDateTime createdTime,
                    LocalDateTime updateTime, int viewCount, Long wishlistCount,

@@ -34,17 +34,13 @@ public class WishlistController {
             if(authentication == null)
                 throw new Exception("authentication is null. non user Info");
 
-            // Authentication 유저
-            String authKakaoName = authentication.getName();
-            UserResponseDto authUserResponseDto = userService.findByUserKakaoNickName(authKakaoName);
+            String kakaoName = authentication.getName();
+            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
 
-            // wishlistDto 유저
-            String wishKakaoName = wishlistDto.getKakaoName();
-            UserResponseDto wishUserResponseDto =  userService.findByUserKakaoNickName(wishKakaoName);
-
-            boolean sameCheck = userService.isSameUser(authUserResponseDto, wishUserResponseDto);
-            if(!sameCheck) throw new Exception("권한이 없습니다.");
-
+            //kakaoName으로 찾은 유저의 id와 pathVariable로 받은 id가 같은지 검증
+            if(!userService.isSameUser(wishlistDto.getUserId(), userResponseDto)){
+                throw new Exception("user is not same");
+            }
 
             Wishlist wishlist = wishlistService.addPostToWishlist(wishlistDto);
             if(wishlist == null)    throw new Exception("찜하기 실패");

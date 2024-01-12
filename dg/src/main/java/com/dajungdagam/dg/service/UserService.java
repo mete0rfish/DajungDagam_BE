@@ -66,6 +66,16 @@ public class UserService {
         return new UserResponseDto(user);
     }
 
+    public User findByUserId(int userId){
+        Optional<User> userObj = repository.findById(userId);
+        if(userObj.isEmpty()){
+            log.error("유저가 없습니다.");
+            return null;
+        }
+
+        return userObj.get();
+    }
+
     // 회원가입 시, 찜목록 만들기
     @Transactional
     public int signUp(Map<String, Object> userInfo) {

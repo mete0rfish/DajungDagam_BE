@@ -49,7 +49,10 @@ public class WishlistService {
         Wishlist wishlist = null;
         try {
             //log.info("wishlist 1 : " + wishlistDto.getKakaoName());
-            User user = userRepository.findByKakaoName(wishlistDto.getKakaoName());
+            Optional<User> userObj = userRepository.findById(wishlistDto.getUserId());
+            if(userObj.isEmpty())   throw new Exception("유저가 없습니다.");
+            User user = userObj.get();
+
             //log.info("wishlist 2 : " + user.getKakaoName());
             wishlist = wishlistRepository.findByUser(user);
             //log.info("wish: " + wishlist.toString());
@@ -59,25 +62,21 @@ public class WishlistService {
 
             if(wishlist == null)    throw new Exception("wishlist is null");
 
-            // 0: 공동구매인 경우
-            if (postCategory == 0) {
-                // 공동구매 아직 구현 X
 
-            } else {
-                Optional<Post> tradePostObj = postRepository.findById(postId);
-                Post tradePost = tradePostObj.get();
-                log.info("TradePost: "+ tradePost.toString());
+            Optional<Post> tradePostObj = postRepository.findById(postId);
+            Post tradePost = tradePostObj.get();
+            log.info("TradePost: "+ tradePost.toString());
 
-                if(tradePost == null)    throw new Exception("wishlist is null");
+            if(tradePost == null)    throw new Exception("wishlist is null");
 
-                wishlist.addTradePost(tradePost);
-                wishlistRepository.save(wishlist);
-                // wishlistCount 증가
-                tradePost.setWishlistCount(tradePost.getWishlistCount() + 1);
+            wishlist.addTradePost(tradePost);
+            wishlistRepository.save(wishlist);
+            // wishlistCount 증가
+            tradePost.setWishlistCount(tradePost.getWishlistCount() + 1);
 
-                log.info("wishlist의 tradeposts: " + wishlist.getTradePosts().toString());
+            log.info("wishlist의 tradeposts: " + wishlist.getTradePosts().toString());
 
-            }
+
         } catch(Exception e){
             log.info(e.getMessage());
             return null;
@@ -94,11 +93,7 @@ public class WishlistService {
 
             if(wishlist == null)    throw new Exception("wishlist is null");
 
-            // 0: 공동구매인 경우
-            if (postCategory == 0) {
-                // 공동구매 아직 구현 X
 
-            } else {
                 Optional<Post> tradePostObj = postRepository.findById(postId);
                 Post tradePost = tradePostObj.get();
 
@@ -124,7 +119,7 @@ public class WishlistService {
                 wishlistRepository.save(wishlist);
 
                 log.info("위시 리스트에서 " + postId + "번 게시글이 삭제됨.");
-            }
+
         } catch(Exception e) {
             log.info(e.getMessage());
         }
@@ -133,6 +128,10 @@ public class WishlistService {
 
     public Wishlist getWishlistByUserId(int userId) {
         Optional<User> userObj = userRepository.findById(userId);
+        if(userObj.isEmpty())   {
+            log.error("유저가 없음");
+            return null;
+        }
         User user = userObj.get();
 
         return wishlistRepository.findByUser(user);

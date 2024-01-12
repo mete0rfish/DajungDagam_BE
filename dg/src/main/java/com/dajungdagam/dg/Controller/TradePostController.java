@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -64,10 +66,14 @@ public class TradePostController {
     }
 
     @GetMapping("/trade/like-posts")
-    public List<TradePostSummaryDto> liked_list() {
+    public ResponseEntity<List<TradePostSummaryDto>> liked_list() {
 
         List<TradePostSummaryDto> likePostsSummaryDtos = postService.getLikePosts();
-        return likePostsSummaryDtos;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        return new ResponseEntity<>(likePostsSummaryDtos, headers, HttpStatus.OK);
         //인기글 목록에는 모든 정보가 필요하지 않다. -> TradePostSummaryDto를 이용하여 반환
         //return new TradePostSummaryDto();
     }
