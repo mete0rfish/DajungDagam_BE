@@ -28,6 +28,7 @@ public class PostDto {
 
     private Wishlist wishlist;
 
+
     private ItemCategory itemCategory;
 
 

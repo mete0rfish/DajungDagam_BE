@@ -4,6 +4,7 @@ import com.dajungdagam.dg.domain.dto.PostDto;
 import com.dajungdagam.dg.domain.dto.UserMypageInfoResponseDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.dto.WishlistResponseDto;
+import com.dajungdagam.dg.domain.entity.User;
 import com.dajungdagam.dg.domain.entity.Wishlist;
 import com.dajungdagam.dg.service.PostService;
 import com.dajungdagam.dg.service.UserService;
@@ -37,62 +38,34 @@ public class MypageController {
     @Autowired
     private WishlistService wishlistService;
 
+
+    // 자신만 볼 수 있게 한거 롤백
     @PostMapping("/mypage/{user_id}")
-    public ResponseEntity<UserMypageInfoResponseDto> getUserInfo(Authentication authentication, @PathVariable("user_id") int user_id) {
+    public ResponseEntity<UserMypageInfoResponseDto> getUserInfo(@PathVariable("user_id") int user_id) {
         UserMypageInfoResponseDto userMypageInfoResponseDto = null;
-        try{
-            if(authentication == null)
-                throw new Exception("authentication is null");
+        User user = userService.findByUserId(user_id);
 
-            String kakaoName = authentication.getName();
-            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+        // kakao Name으로 받아오기
+        userMypageInfoResponseDto = new UserMypageInfoResponseDto(user.getNickName(),
+                user.getInfo(), user.getArea().getGuName(), user.getArea().getDongName());
 
-            //kakaoName으로 찾은 유저의 id와 pathVariable로 받은 id가 같은지 검증
-            if(!userService.isSameUser(user_id, userResponseDto)){
-                throw new Exception("user is not same");
-            }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-            // kakao Name으로 받아오기
-            userMypageInfoResponseDto = new UserMypageInfoResponseDto(userResponseDto.getUser(), HttpStatus.OK);
-            //model.addAttribute("TradePostList", tradePostDtoList);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-
-            return new ResponseEntity<>(userMypageInfoResponseDto, headers, HttpStatus.OK);
-
-        } catch(Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+        return new ResponseEntity<>(userMypageInfoResponseDto, headers, HttpStatus.OK);
     }
 
     @PostMapping("/mypage/{user_id}/posts")
-    public ResponseEntity<List<PostDto>> getWrittenPosts(Authentication authentication, @PathVariable("user_id") int user_id) {
+    public ResponseEntity<List<PostDto>> getWrittenPosts(@PathVariable("user_id") int user_id) {
         List<PostDto> postDtoList = null;
-        try{
-            if(authentication == null)
-                throw new Exception("authentication is null");
 
-            String kakaoName = authentication.getName();
-            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+        // kakao Name으로 받아오기
+        postDtoList = postService.searchPostsByUserId(user_id);
 
-            //kakaoName으로 찾은 유저의 id와 pathVariable로 받은 id가 같은지 검증
-            if(!userService.isSameUser(user_id, userResponseDto)){
-                throw new Exception("user is not same");
-            }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
-            // kakao Name으로 받아오기
-            postDtoList = postService.searchPostsByUserId(user_id);
-            //model.addAttribute("TradePostList", tradePostDtoList);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-
-            return new ResponseEntity<>(postDtoList, headers, HttpStatus.OK);
-
-        } catch(Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+        return new ResponseEntity<>(postDtoList, headers, HttpStatus.OK);
     }
 
     @PostMapping("/mypage/{user_id}/wishlist")

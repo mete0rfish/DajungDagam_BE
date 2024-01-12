@@ -46,6 +46,18 @@ public class Post extends BaseEntity {
     @Column(length = 50, name = "tp_title")
     private String title;
 
+    @Column
+    private int price;
+
+    @Column
+    private int personCount;
+
+    @Column
+    private int personCurrCount;
+
+    @Column
+    private LocalDateTime deadline;
+
     @Column(name = "post_type", nullable = false)
     private int postType;
 
