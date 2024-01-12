@@ -1,6 +1,6 @@
 package com.dajungdagam.dg.domain.dto;
 
-import com.dajungdagam.dg.domain.entity.TradePost;
+import com.dajungdagam.dg.domain.entity.Post;
 import com.dajungdagam.dg.domain.entity.User;
 import com.dajungdagam.dg.domain.entity.Wishlist;
 import lombok.*;

@@ -25,9 +25,7 @@ public class PostDto {
     private Long wishlistCount;
     private String chatLink;
     private TradeStatus tradeStatus;
-
     private Wishlist wishlist;
-
     private ItemCategory itemCategory;
 
 
@@ -71,7 +69,6 @@ public class PostDto {
         this.wishlistCount = wishlistCount;
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
-        this.wishlist = wishlist;
         this.itemCategory = itemCategory;
 
     }

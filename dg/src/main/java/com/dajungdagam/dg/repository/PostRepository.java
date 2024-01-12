@@ -1,8 +1,10 @@
 package com.dajungdagam.dg.repository;
 
 import com.dajungdagam.dg.domain.dto.PostDto;
+import com.dajungdagam.dg.domain.entity.Area;
 import com.dajungdagam.dg.domain.entity.ItemCategory;
 import com.dajungdagam.dg.domain.entity.Post;
+import com.dajungdagam.dg.domain.entity.TradeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,8 +26,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("update Post p set p.viewCount = p.viewCount + 1 where p.id = :id")
     int updateviewCount(Long id);
 
-    // 해당 카테고리에 속한 게시글 검색
-    List<PostDto> findByItemCategory(ItemCategory itemCategory);
+    List<Post> findByItemCategory(ItemCategory itemCategory);
+
+    List<Post> findByTradeStatus(TradeStatus tradeStatus);
+
+    List<Post> findByArea(Area area);
+
 
 //    // 특정 타입의 글 조회
 //    List<PostDto> findByType(int postType);

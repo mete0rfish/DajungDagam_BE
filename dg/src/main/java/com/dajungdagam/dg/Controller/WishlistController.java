@@ -1,4 +1,4 @@
-package com.dajungdagam.dg.controller;
+package com.dajungdagam.dg.Controller;
 
 import com.dajungdagam.dg.domain.dto.WishlistDto;
 import com.dajungdagam.dg.domain.entity.Wishlist;
