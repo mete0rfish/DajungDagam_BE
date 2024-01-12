@@ -1,5 +1,6 @@
 package com.dajungdagam.dg.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class Image {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
+    @JsonBackReference
     private Post post;
 
     @Builder

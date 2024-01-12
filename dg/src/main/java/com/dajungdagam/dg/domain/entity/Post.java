@@ -2,6 +2,7 @@ package com.dajungdagam.dg.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
@@ -38,6 +39,7 @@ public class Post extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
+
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -46,6 +48,21 @@ public class Post extends BaseEntity {
 
     @Column(length = 50, name = "post_title", nullable = false)
     private String title;
+
+    @Column(columnDefinition = "integer default 0")
+    @NonNull
+    private Integer price;
+
+    @Column(columnDefinition = "integer default 0")
+    @NonNull
+    private Integer personCount;
+
+    @Column(columnDefinition = "integer default 0")
+    @NonNull
+    private Integer personCurrCount;
+
+    @Column
+    private LocalDateTime deadline;
 
     @Column(name = "post_type", nullable = false)
     private int postType;
@@ -77,6 +94,7 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, //orphanRemoval = true,
                 fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Image> images = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)

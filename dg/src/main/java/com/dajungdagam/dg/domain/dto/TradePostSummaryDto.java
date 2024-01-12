@@ -2,6 +2,7 @@ package com.dajungdagam.dg.domain.dto;
 
 import com.dajungdagam.dg.domain.entity.TradeStatus;
 import com.dajungdagam.dg.domain.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Getter
@@ -11,6 +12,7 @@ import lombok.*;
 public class TradePostSummaryDto {
 
     private Long id;
+    @JsonIgnore
     private User user;
     private String title;
     private String tradeArea;
