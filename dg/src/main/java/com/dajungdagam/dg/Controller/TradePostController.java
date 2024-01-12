@@ -12,6 +12,9 @@ import com.dajungdagam.dg.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.http.HttpHeaders;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +23,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+
+import java.nio.charset.StandardCharsets;
+
 import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -57,18 +64,21 @@ public class TradePostController {
     }
 
     @GetMapping("/trade/like-posts")
-    public List<TradePostSummaryDto> liked_list() {
+    public ResponseEntity<List<TradePostSummaryDto>> liked_list() {
 
         List<TradePostSummaryDto> likePostsSummaryDtos = postService.getLikePosts();
-        return likePostsSummaryDtos;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        return new ResponseEntity<>(likePostsSummaryDtos, headers, HttpStatus.OK);
         //인기글 목록에는 모든 정보가 필요하지 않다. -> TradePostSummaryDto를 이용하여 반환
         //return new TradePostSummaryDto();
     }
 
     @PostMapping(value = "/trade/posts")
-    public ResponseEntity<String> write(PostDto postDto, Authentication authentication,
-                                        @RequestPart MultipartFile[] images) throws IOException {
-        log.info("title: " + postDto.getTitle() + " , content : " + postDto.getContent());
+    public ResponseEntity<String> write(PostDto postDto, Authentication authentication, @RequestPart MultipartFile[] images) throws IOException {
+
         try {
             if(authentication == null)
                 throw new Exception("authentication is null. non user Info");
@@ -84,7 +94,6 @@ public class TradePostController {
         }
 
         return ResponseEntity.ok().body("게시글 생성 완료");
-
     }
 
 
@@ -96,18 +105,7 @@ public class TradePostController {
         return new ResponseEntity<>(postDto, HttpStatus.OK);
     }
 
-//    @GetMapping("/trade/posts/update/{post_id}")
-//    public ResponseEntity<Map<String, Object>> edit(@PathVariable("post_id") Long post_id) {
-//        PostDto postDto = postService.getPost(post_id);
-//
-//        List<Image> images = postService.getImagesByTradePost(postDto.toEntity());
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("postDto", postDto);
-//        response.put("images", images);
-//
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//    }
+
 
     @GetMapping("/trade/posts/update/{post_id}")
     public ResponseEntity<TradePostSimpleDto> edit(@PathVariable("post_id") Long post_id) {

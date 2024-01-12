@@ -66,6 +66,16 @@ public class UserService {
         return new UserResponseDto(user);
     }
 
+    public User findByUserId(int userId){
+        Optional<User> userObj = repository.findById(userId);
+        if(userObj.isEmpty()){
+            log.error("유저가 없습니다.");
+            return null;
+        }
+
+        return userObj.get();
+    }
+
     // 회원가입 시, 찜목록 만들기
     @Transactional
     public int signUp(Map<String, Object> userInfo) {
@@ -90,12 +100,15 @@ public class UserService {
 
     // 유저 별명 업데이트
     @Transactional
-    public int updateUserNickName(int userId, String nickName) {
+    public int updateUserNickName(UserResponseDto userResponseDto, int userId, String nickName) {
         int id = -1;
         try{
 
             Optional<User> userObj = repository.findById(userId);
             User user = userObj.get();
+
+            // 요청 보낸 유저와 같은지 체크
+            if(!isSameUser(userId, userResponseDto))   throw new Exception("권한이 없습니다.");
 
             user.setNickName(nickName);
 
@@ -113,12 +126,15 @@ public class UserService {
     // 유저 사는곳 업데이트
 
     @Transactional
-    public int updateUserArea(int userId, String gu, String dong){
+    public int updateUserArea(UserResponseDto userResponseDto, int userId, String gu, String dong){
         int id = -1;
         try{
 
             Optional<User> userObj = repository.findById(userId);
             User user = userObj.get();
+
+            // 요청 보낸 유저와 같은지 체크
+            if(!isSameUser(userId, userResponseDto))   throw new Exception("권한이 없습니다.");
 
             Area area = areaRepository.findByGuNameAndDongName(gu, dong);
             user.setArea(area);
@@ -133,12 +149,15 @@ public class UserService {
     }
 
     @Transactional
-    public int updateUserInfo(int userId, String info) {
+    public int updateUserInfo(UserResponseDto userResponseDto, int userId, String info) {
         int id = -1;
         try{
 
             Optional<User> userObj = repository.findById(userId);
             User user = userObj.get();
+
+            // 요청 보낸 유저와 같은지 체크
+            if(!isSameUser(userId, userResponseDto))   throw new Exception("권한이 없습니다.");
 
             user.setInfo(info);
 
@@ -153,13 +172,23 @@ public class UserService {
 
 
     @Transactional
-    public boolean deleteUser(int userId) {
+    public boolean deleteUser(UserResponseDto userResponseDto, int userId) {
         try {
             Optional<User> userObj = repository.findById(userId);
+            log.info("userObj: " + userObj.toString());
             User user = userObj.get();
 
+
+            // 요청 보낸 유저와 같은지 체크
+            if(!isSameUser(userId, userResponseDto))   throw new Exception("권한이 없습니다.");
+
             boolean res = postService.deleteAllPost(user);
-            if (!res) throw new Exception("User delete failed!");
+            Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
+
+            repository.deleteById(userId);
+            wishlistService.deleteWishlistTable(wishlist);
+
+        if (!res) throw new Exception("User delete failed!");
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -184,13 +213,20 @@ public class UserService {
 //        return true;
 //    }
 
-    public boolean isSameUser(int userId, UserResponseDto userResponseDto){
-        User user = userResponseDto.getUser();
 
+
+    public static boolean isSameUser(int userId, UserResponseDto userResponseDto){
+        User user = userResponseDto.getUser();
 
         return user.getId() == userId;
     }
 
+    public static boolean isSameUser(UserResponseDto authUserResponseDto, UserResponseDto wishlistResponseDto) {
+        User authUser = authUserResponseDto.getUser();
+        User wishUser = wishlistResponseDto.getUser();
+
+        return authUser.getId() == wishUser.getId();
+    }
 
 
 }

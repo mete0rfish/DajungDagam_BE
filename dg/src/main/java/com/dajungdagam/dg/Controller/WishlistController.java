@@ -1,5 +1,6 @@
 package com.dajungdagam.dg.Controller;
 
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.dto.WishlistDto;
 import com.dajungdagam.dg.domain.entity.Wishlist;
 import com.dajungdagam.dg.service.UserService;
@@ -27,26 +28,29 @@ public class WishlistController {
 
     // 찜하기
     @PostMapping("/wishlist")
-    public ResponseEntity<Wishlist> likes(@RequestBody WishlistDto wishlistDto) {
+    public ResponseEntity<String> likes(Authentication authentication, @RequestBody WishlistDto wishlistDto) {
 
-        log.info(wishlistDto.getKakaoName());
+        try{
+            if(authentication == null)
+                throw new Exception("authentication is null. non user Info");
 
-        Wishlist wishlist = wishlistService.addPostToWishlist(wishlistDto);
+            String kakaoName = authentication.getName();
+            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+            //kakaoName으로 찾은 유저의 id와 pathVariable로 받은 id가 같은지 검증
+            if(!userService.isSameUser(wishlistDto.getUserId(), userResponseDto)){
+                throw new Exception("user is not same");
+            }
 
-        if(wishlist == null) {
-            log.info("찜하기 실패");
-            return new ResponseEntity<>(null, headers, HttpStatus.BAD_REQUEST);
+            Wishlist wishlist = wishlistService.addPostToWishlist(wishlistDto);
+            if(wishlist == null)    throw new Exception("찜하기 실패");
+
+            return ResponseEntity.ok().body("찜 완료");
+        } catch(Exception e){
+
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
-
-        log.info("찜하기 성공");
-        log.info("wishlist: " + wishlist.toString());
-
-        // wishlist Count 증가시키기
-
-        return new ResponseEntity<>(wishlist, headers, HttpStatus.OK);
     }
 
     // 찜 취소하기
@@ -58,6 +62,7 @@ public class WishlistController {
             if(authentication == null)  throw new Exception("authentication is null");
 
             String kakaoName = authentication.getName();
+
             wishlist = wishlistService.deletePostAtWishlist(kakaoName, postCategory, postId);
 
             log.info("찜목록 게시글 삭제됨.");
@@ -73,22 +78,39 @@ public class WishlistController {
 
         log.info("wishlist: " + wishlist.toString());
 
-
-
-
         return new ResponseEntity<>(wishlist, headers, HttpStatus.OK);
 
     }
 
     @PostMapping("/wishlist/{userId}")
-    public ResponseEntity<Wishlist> getWishlistByUserId(@PathVariable("userId") int userId){
-        Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
+    public ResponseEntity<Wishlist> getWishlistByUserId(Authentication authentication, @PathVariable("userId") int userId){
+        try{
+            if(authentication == null)
+                throw new Exception("authentication is null. non user Info");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+            String kakaoName = authentication.getName();
+            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
 
-        log.info("wishlist: " + wishlist.toString());
+            if(!UserService.isSameUser(userId, userResponseDto))
+                throw new Exception("권한이 없습니다.");
 
-        return new ResponseEntity<>(wishlist, headers, HttpStatus.OK);
+            Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+            log.info("wishlist: " + wishlist.toString());
+
+            return new ResponseEntity<>(wishlist, headers, HttpStatus.OK);
+        } catch(Exception e){
+
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+
+
+
+
+
     }
 }
