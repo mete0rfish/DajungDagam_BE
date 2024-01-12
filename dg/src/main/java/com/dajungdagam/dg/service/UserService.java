@@ -1,8 +1,6 @@
 package com.dajungdagam.dg.service;
 
-import com.dajungdagam.dg.domain.entity.Area;
-import com.dajungdagam.dg.domain.entity.RoleType;
-import com.dajungdagam.dg.domain.entity.User;
+import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.domain.dto.UserKakaoLoginResponseDto;
 import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.jwt.jwtTokenProvider;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -26,7 +25,13 @@ public class UserService {
     private UserJpaRepository repository;
 
     @Autowired
+    private WishlistService wishlistService;
+
+    @Autowired
     private AreaJpaRepository areaRepository;
+
+    @Autowired
+    private PostService postService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -61,16 +66,20 @@ public class UserService {
         return new UserResponseDto(user);
     }
 
+    // 회원가입 시, 찜목록 만들기
     @Transactional
     public int signUp(Map<String, Object> userInfo) {
         int id = 0;
         String kakaoName = (String)userInfo.get("kakaoName");
         log.info(kakaoName + " in userInfo.");
         try{
-            User user = new User(0, kakaoName, RoleType.USER);
+            User user = new User(kakaoName, RoleType.USER);
             log.info(user.getKakaoName() + " 가 저장되었습니다.");
             id = repository.save(user).getId();
 
+            Wishlist wishlist = wishlistService.addWishlist(user.getKakaoName());
+            log.info("새로운 회원 로그인 만들어짐.");
+            log.info("찜목록: " + wishlist.toString());
 
         } catch(Exception e){
             System.out.println(e);
@@ -81,13 +90,12 @@ public class UserService {
 
     // 유저 별명 업데이트
     @Transactional
-    public int updateUserNickName(String kakaoName, String nickName) {
+    public int updateUserNickName(int userId, String nickName) {
         int id = -1;
         try{
 
-            User user = repository.findByKakaoName(kakaoName);
-            if(user == null)
-                throw new Exception("닉네임을 변경할 유저의 정보가 없습니다.");
+            Optional<User> userObj = repository.findById(userId);
+            User user = userObj.get();
 
             user.setNickName(nickName);
 
@@ -105,15 +113,13 @@ public class UserService {
     // 유저 사는곳 업데이트
 
     @Transactional
-    public int updateUserArea(String kakaoName, String gu, String dong){
+    public int updateUserArea(int userId, String gu, String dong){
         int id = -1;
         try{
 
-            UserResponseDto userResponseDto = findByUserKakaoNickName(kakaoName);
-            if(userResponseDto.getUser() == null)
-                throw new Exception("닉네임을 변경할 유저의 정보가 없습니다.");
+            Optional<User> userObj = repository.findById(userId);
+            User user = userObj.get();
 
-            User user = userResponseDto.getUser();
             Area area = areaRepository.findByGuNameAndDongName(gu, dong);
             user.setArea(area);
 
@@ -125,6 +131,66 @@ public class UserService {
 
         return id;
     }
+
+    @Transactional
+    public int updateUserInfo(int userId, String info) {
+        int id = -1;
+        try{
+
+            Optional<User> userObj = repository.findById(userId);
+            User user = userObj.get();
+
+            user.setInfo(info);
+
+            id = repository.save(user).getId();
+
+        } catch(Exception e){
+            e.getStackTrace();
+        }
+
+        return id;
+    }
+
+
+    @Transactional
+    public boolean deleteUser(int userId) {
+        try {
+            Optional<User> userObj = repository.findById(userId);
+            User user = userObj.get();
+
+            boolean res = postService.deleteAllPost(user);
+            if (!res) throw new Exception("User delete failed!");
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+//    @Transactional
+//    public boolean deleteUser(UserResponseDto userResponseDto) {
+//        try {
+//            User user = userResponseDto.getUser();
+//
+//            boolean res = tradePostService.deleteAllPost(user);
+//            if (!res) throw new Exception("User delete failed!");
+//
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            return false;
+//        }
+//
+//        return true;
+//    }
+
+    public boolean isSameUser(int userId, UserResponseDto userResponseDto){
+        User user = userResponseDto.getUser();
+
+
+        return user.getId() == userId;
+    }
+
 
 
 }

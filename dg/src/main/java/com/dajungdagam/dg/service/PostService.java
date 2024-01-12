@@ -1,13 +1,15 @@
 package com.dajungdagam.dg.service;
 
 import com.dajungdagam.dg.domain.dto.PostDto;
-import com.dajungdagam.dg.domain.entity.Image;
-import com.dajungdagam.dg.domain.entity.ItemCategory;
-import com.dajungdagam.dg.domain.entity.Post;
+import com.dajungdagam.dg.domain.dto.TradePostSummaryDto;
+import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.repository.ImageRepository;
 import com.dajungdagam.dg.repository.ItemCategoryRepository;
 import com.dajungdagam.dg.repository.PostRepository;
+import com.dajungdagam.dg.repository.WishListJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,12 +26,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class PostService {
 
     private PostRepository postRepository;
     private ImageRepository imageRepository;
+
+
+    private WishlistService wishlistService;
+
+    private WishListJpaRepository wishlistRepository;
 
     private ItemCategoryRepository itemCategoryRepository;
 
@@ -37,12 +46,16 @@ public class PostService {
     private static final int PAGE_POST_COUNT = 9; // 한 페이지에 존재하는 게시글 수
 
     @Autowired
-     public PostService(PostRepository postRepository, ImageRepository imageRepository,
-                        ItemCategoryRepository itemCategoryRepository) {
+    public PostService(PostRepository postRepository, ImageRepository imageRepository, WishlistService wishlistService, WishListJpaRepository wishlistRepository, ItemCategoryRepository itemCategoryRepository) {
         this.postRepository = postRepository;
         this.imageRepository = imageRepository;
+        this.wishlistService = wishlistService;
+        this.wishlistRepository = wishlistRepository;
         this.itemCategoryRepository = itemCategoryRepository;
     }
+
+
+
 
     @Transactional
     public List<PostDto> searchPosts(String keyword) {
@@ -75,6 +88,7 @@ public class PostService {
                 .itemCategory(post.getItemCategory())
                 .build();
     }
+
 
     // 절대 경로임. Mac 기준 경로임을 유의
     private final String imagePath = "/Users/choehyeontae/Desktop/images/";
@@ -159,13 +173,11 @@ public class PostService {
     }
 
     @Transactional
-    public List<PostDto> getPostlist(Integer pageNum) {
+    public List<PostDto> getPostlist() {
 
-         Page<Post> page = postRepository
-                 .findAll(PageRequest.of(pageNum-1, PAGE_POST_COUNT,
-                         Sort.by(Sort.Direction.ASC, "createdTime")));
+        List<Post> posts = postRepository
+                .findAll(Sort.by(Sort.Direction.ASC, "createdTime"));
 
-        List<Post> posts = page.getContent();
         List<PostDto> postDtoList = new ArrayList<>();
 
         for (Post post : posts) {
@@ -261,31 +273,109 @@ public class PostService {
         return postRepository.updateviewCount(id);
     }
 
-//    @Transactional // 게시글 수정 시 파일 삭제 기능 (일단 보류)
-//    public void deleteImage(Long id) {
-//        imageRepository.deleteById(id);
-//    }
-
-    // 해당 카테고리에 속한 게시글 검색
     @Transactional
-    public List<PostDto> getTradePostsByCategory(ItemCategory itemCategory) {
-        return postRepository.findByItemCategory(itemCategory);
+    public List<Post> getAllTradePostWithUserId(int userId) {
+        List<Post> tradePosts = postRepository.findAllByUserId(userId);
+
+        if(tradePosts.isEmpty()){
+            log.info("tradePosts is Empty");
+            return null;
+        }
+
+        return tradePosts;
     }
 
-    // 해당 ID에 해당하는 카테고리 조회
     @Transactional
-    public ItemCategory getItemCategoryById(Long id) {
-        return itemCategoryRepository.findById(id).orElse(null);
+    public boolean deleteAllPost(User user) {
+        int userId = user.getId();
+        String kakaoName = user.getKakaoName();
+
+        List<Post> tradePostList= this.getAllTradePostWithUserId(userId);
+        Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
+
+
+        for(Post tradePost : wishlist.getTradePosts()) {
+            postRepository.deleteById(tradePost.getId());
+        }
+
+        for(Post tradePost : tradePostList) {
+            postRepository.deleteById(tradePost.getId());
+        }
+
+        wishlistRepository.deleteById(wishlist.getId());
+
+        tradePostList= this.getAllTradePostWithUserId(userId);
+        return tradePostList == null;
     }
 
-//    // 공동구매 글 목록 조회
-//    public List<PostDto> getTradePosts() {
-//        return postRepository.findByType(0);
-//    }
-//
-//    // 물품거래 글 목록 조회
-//    public List<PostDto> getGroupbuyingPosts() {
-//        return postRepository.findByType(1);
-//    }
+    @Transactional
+    public List<PostDto> searchPostsByUserId(int userId) {
+        List<Post> tradePosts = postRepository.findByUserId(userId);
+        List<PostDto> tradePostDtoList = new ArrayList<>();
+
+        if(tradePosts.isEmpty()){
+            log.info("tradePosts is Empty");
+            return tradePostDtoList;
+        }
+
+        for(Post tradePost : tradePosts){
+            tradePostDtoList.add(this.convertEntityToDto(tradePost));
+        }
+
+        return tradePostDtoList;
+    }
+
+    public List<TradePostSummaryDto> getLikePosts() {
+        List<Post> likePosts = postRepository.findTop3ByOrderByWishlistCountDesc();
+        List<TradePostSummaryDto> summaryDtos = new ArrayList<>();
+        for (Post likePost : likePosts) {
+            TradePostSummaryDto tradePostSummaryDto = TradePostSummaryDto.builder()
+                    .id(likePost.getId())
+                    .user(likePost.getUser())
+                    .title(likePost.getTitle())
+                    .tradeArea(likePost.getTradeArea())
+                    .content(likePost.getContent())
+                    .viewCount(likePost.getViewCount())
+                    .wishlistCount(likePost.getWishlistCount())
+                    .tradeStatus(likePost.getTradeStatus())
+                    .build();
+            summaryDtos.add(tradePostSummaryDto);
+        }
+        return summaryDtos;
+    }
+
+    @Transactional
+    public List<PostDto> getPostsByStatus(TradeStatus tradeStatus) {
+        List<Post> postList = postRepository.findByTradeStatus(tradeStatus);
+        return postList.stream()
+                .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
+                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
+                        post.getTradeStatus(), post.getItemCategory()))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<PostDto> getPostsByCategory(ItemCategory itemCategory) {
+        List<Post> postsInCategory = postRepository.findByItemCategory(itemCategory);
+        return postsInCategory.stream()
+                .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
+                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
+                        post.getTradeStatus(), post.getItemCategory()))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<PostDto> getPostsByArea(Area area) {
+        List<Post> postsInArea = postRepository.findByArea(area);
+        return postsInArea.stream()
+                .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
+                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
+                        post.getTradeStatus(), post.getItemCategory()))
+                .collect(Collectors.toList());
+    }
+
 }
 

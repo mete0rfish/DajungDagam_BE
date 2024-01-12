@@ -25,7 +25,9 @@ public class PostDto {
     private Long wishlistCount;
     private String chatLink;
     private TradeStatus tradeStatus;
+    private Wishlist wishlist;
     private ItemCategory itemCategory;
+
 
     public Post toEntity() {
         return Post.builder()
@@ -47,10 +49,12 @@ public class PostDto {
     }
 
     @Builder
+
     public PostDto(Long id, User user, Area area, String title, int postType,
                    String tradeArea, String content, LocalDateTime createdTime,
                    LocalDateTime updateTime, int viewCount, Long wishlistCount,
                    String chatLink, TradeStatus tradeStatus, ItemCategory itemCategory)
+
     {
         this.id = id;
         this.user = user;
@@ -66,6 +70,7 @@ public class PostDto {
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
         this.itemCategory = itemCategory;
+
     }
 
 }
