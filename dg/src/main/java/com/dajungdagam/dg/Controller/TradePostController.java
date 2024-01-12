@@ -35,30 +35,45 @@ import java.util.Map;
 @Slf4j
 public class TradePostController {
 
-    @Autowired
     private PostService postService;
+    private ItemCategoryService itemCategoryService;
 
     @Autowired
     private UserService userService;
 
-    public TradePostController(PostService postService, UserService userService) {
+    public TradePostController(PostService postService, ItemCategoryService itemCategoryService,
+                               UserService userService) {
         this.postService = postService;
+        this.itemCategoryService = itemCategoryService;
         this.userService = userService;
     }
 
     @GetMapping("/trade")
     public ResponseEntity<List<PostDto>> list() {
-        List<PostDto> postDtoList = postService.getPostlist(1);
+        List<PostDto> postDtoList = postService.getPostlist();
 
         return new ResponseEntity<>(postDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/trade/posts")
+    public ResponseEntity<PostDto> saveForm() {
+
+        PostDto postDto = new PostDto();
+
+        return new ResponseEntity<>(postDto, HttpStatus.OK);
     }
 
     @GetMapping("/trade/like-posts")
     public ResponseEntity<List<TradePostSummaryDto>> liked_list() {
 
-        List<TradePostSummaryDto> likePostsSummaryDtos = postService.getLikePosts(1);
+        List<TradePostSummaryDto> likePostsSummaryDtos = postService.getLikePosts();
 
-        return new ResponseEntity<>(likePostsSummaryDtos, HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        return new ResponseEntity<>(likePostsSummaryDtos, headers, HttpStatus.OK);
+        //인기글 목록에는 모든 정보가 필요하지 않다. -> TradePostSummaryDto를 이용하여 반환
+        //return new TradePostSummaryDto();
     }
 
     @PostMapping(value = "/trade/posts")
@@ -121,7 +136,7 @@ public class TradePostController {
 
     @GetMapping("/trade/posts/search")
     public ResponseEntity<List<PostDto>> search(@RequestParam String keyword) {
-        List<PostDto> postDtoList = postService.searchPosts(keyword, 1);
+        List<PostDto> postDtoList = postService.searchPosts(keyword);
 
         return new ResponseEntity<>(postDtoList, HttpStatus.OK);
     }
@@ -129,21 +144,23 @@ public class TradePostController {
 
     @GetMapping("/trade/posts/category/{itemCategory}")
     public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable ItemCategory itemCategory) {
-        List<PostDto> postsByCategory = postService.getPostsByCategory(itemCategory,1);
+        List<PostDto> postsByCategory = postService.getPostsByCategory(itemCategory);
         return new ResponseEntity<>(postsByCategory, HttpStatus.OK);
     }
 
 
     @GetMapping("/trade/posts/status/{tradeStatus}")
     public ResponseEntity<List<PostDto>> getPostsByStatus(@PathVariable TradeStatus tradeStatus) {
-        List<PostDto> postsByStatus = postService.getPostsByStatus(tradeStatus,1);
+        List<PostDto> postsByStatus = postService.getPostsByStatus(tradeStatus);
         return new ResponseEntity<>(postsByStatus, HttpStatus.OK);
     }
 
     @GetMapping("/trade/posts/area/{area}")
     public ResponseEntity<List<PostDto>> getPostsByArea(@PathVariable Area area) {
-        List<PostDto> postsByArea = postService.getPostsByArea(area,1);
+        List<PostDto> postsByArea = postService.getPostsByArea(area);
         return new ResponseEntity<>(postsByArea, HttpStatus.OK);
     }
+
+
 
 }

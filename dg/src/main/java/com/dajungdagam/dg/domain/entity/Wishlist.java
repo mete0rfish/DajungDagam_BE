@@ -32,7 +32,7 @@ public class Wishlist {
     @OneToMany(fetch = FetchType.LAZY)
     @Setter
     @Getter
-    @JsonManagedReference
+    //@JsonManagedReference
     @JsonIgnore
     private List<Post> tradePosts;
 
@@ -41,7 +41,6 @@ public class Wishlist {
 
     @OneToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name="user_id")
-
     private User user;
 
 

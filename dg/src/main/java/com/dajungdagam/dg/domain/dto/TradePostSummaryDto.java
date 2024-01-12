@@ -2,6 +2,7 @@ package com.dajungdagam.dg.domain.dto;
 
 import com.dajungdagam.dg.domain.entity.TradeStatus;
 import com.dajungdagam.dg.domain.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Getter
@@ -11,6 +12,7 @@ import lombok.*;
 public class TradePostSummaryDto {
 
     private Long id;
+    @JsonIgnore
     private User user;
     private String title;
     private String tradeArea;
@@ -18,16 +20,13 @@ public class TradePostSummaryDto {
     private int viewCount;
     private Long wishlistCount;
     private TradeStatus tradeStatus;
-    //    private String chatLink;
-    //    private LocalDateTime createdTime;
-//    private LocalDateTime updateTime;
-    //    private PostType postType;
-    //    private Area area;
+    private int postType;
+
 
     @Builder
     public TradePostSummaryDto(Long id, User user, String title, String tradeArea,
                                String content, int viewCount, Long wishlistCount,
-                               TradeStatus tradeStatus) {
+                               TradeStatus tradeStatus, int postType) {
         this.id = id;
         this.user = user;
         this.title = title;
@@ -36,5 +35,6 @@ public class TradePostSummaryDto {
         this.viewCount = viewCount;
         this.wishlistCount = wishlistCount;
         this.tradeStatus = tradeStatus;
+        this.postType = postType;
     }
 }

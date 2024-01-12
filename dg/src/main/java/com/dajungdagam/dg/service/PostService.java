@@ -40,26 +40,22 @@ public class PostService {
 
     private WishListJpaRepository wishlistRepository;
 
-    private ItemCategoryRepository itemCategoryRepository;
-
     private static final int BLOCK_PAGE_NUM_COUNT = 5; // 블럭에 존재하는 페이지 수
     private static final int PAGE_POST_COUNT = 9; // 한 페이지에 존재하는 게시글 수
 
     @Autowired
-    public PostService(PostRepository postRepository, ImageRepository imageRepository, WishlistService wishlistService, WishListJpaRepository wishlistRepository, ItemCategoryRepository itemCategoryRepository) {
+    public PostService(PostRepository postRepository, ImageRepository imageRepository, WishlistService wishlistService, WishListJpaRepository wishlistRepository) {
         this.postRepository = postRepository;
         this.imageRepository = imageRepository;
         this.wishlistService = wishlistService;
         this.wishlistRepository = wishlistRepository;
-        this.itemCategoryRepository = itemCategoryRepository;
     }
 
 
-
-
     @Transactional
-    public List<PostDto> searchPosts(String keyword) {
-        List<Post> posts = postRepository.findByTitleContaining(keyword);
+    public List<PostDto> searchPosts(String keyword, int postType) {
+        List<Post> posts = postRepository.findByTitleContainingAndPostType(keyword, postType);
+
         List<PostDto> postDtoList = new ArrayList<>();
 
         if (posts.isEmpty()) return postDtoList;
@@ -77,7 +73,6 @@ public class PostService {
                 .user(post.getUser())
                 .title(post.getTitle())
                 .postType(post.getPostType())
-                .tradeArea(post.getTradeArea())
                 .content(post.getContent())
                 .createdTime(post.getCreatedTime())
                 .updateTime(post.getUpdateTime())
@@ -173,10 +168,16 @@ public class PostService {
     }
 
     @Transactional
-    public List<PostDto> getPostlist() {
+    public List<PostDto> getPostlist(int postType) {
+        List<Post> posts;
 
-        List<Post> posts = postRepository
-                .findAll(Sort.by(Sort.Direction.ASC, "createdTime"));
+        if (postType == 1) {
+            posts = postRepository.findByPostType(1, Sort.by(Sort.Direction.ASC, "createdTime"));
+        } else if (postType == 0) {
+            posts = postRepository.findByPostType(0, Sort.by(Sort.Direction.ASC, "createdTime"));
+        } else {
+            throw new IllegalArgumentException("error");
+        }
 
         List<PostDto> postDtoList = new ArrayList<>();
 
@@ -186,7 +187,6 @@ public class PostService {
                     .user(post.getUser())
                     .title(post.getTitle())
                     .postType(post.getPostType())
-                    .tradeArea(post.getTradeArea())
                     .content(post.getContent())
                     .createdTime(post.getCreatedTime())
                     .updateTime(post.getUpdateTime())
@@ -243,7 +243,6 @@ public class PostService {
                 .user(post.getUser())
                 .title(post.getTitle())
                 .postType(post.getPostType())
-                .tradeArea(post.getTradeArea())
                 .content(post.getContent())
                 .createdTime(post.getCreatedTime())
                 .updateTime(post.getUpdateTime())
@@ -288,21 +287,22 @@ public class PostService {
     @Transactional
     public boolean deleteAllPost(User user) {
         int userId = user.getId();
-        String kakaoName = user.getKakaoName();
 
         List<Post> tradePostList= this.getAllTradePostWithUserId(userId);
         Wishlist wishlist = wishlistService.getWishlistByUserId(userId);
 
+        if(tradePostList == null)
+            return true;
 
+        // 찜목록 삭제
         for(Post tradePost : wishlist.getTradePosts()) {
             postRepository.deleteById(tradePost.getId());
         }
 
+        // 작성글 삭제
         for(Post tradePost : tradePostList) {
             postRepository.deleteById(tradePost.getId());
         }
-
-        wishlistRepository.deleteById(wishlist.getId());
 
         tradePostList= this.getAllTradePostWithUserId(userId);
         return tradePostList == null;
@@ -325,55 +325,64 @@ public class PostService {
         return tradePostDtoList;
     }
 
-    public List<TradePostSummaryDto> getLikePosts() {
-        List<Post> likePosts = postRepository.findTop3ByOrderByWishlistCountDesc();
+    public List<TradePostSummaryDto> getLikePosts(int postType) {
+        List<Post> likePosts = postRepository.findTop3ByOrderByWishlistCountDesc(postType);
+
         List<TradePostSummaryDto> summaryDtos = new ArrayList<>();
         for (Post likePost : likePosts) {
             TradePostSummaryDto tradePostSummaryDto = TradePostSummaryDto.builder()
                     .id(likePost.getId())
                     .user(likePost.getUser())
                     .title(likePost.getTitle())
-                    .tradeArea(likePost.getTradeArea())
                     .content(likePost.getContent())
                     .viewCount(likePost.getViewCount())
                     .wishlistCount(likePost.getWishlistCount())
                     .tradeStatus(likePost.getTradeStatus())
+                    .postType(likePost.getPostType())
                     .build();
             summaryDtos.add(tradePostSummaryDto);
         }
         return summaryDtos;
     }
 
+
+
     @Transactional
-    public List<PostDto> getPostsByStatus(TradeStatus tradeStatus) {
-        List<Post> postList = postRepository.findByTradeStatus(tradeStatus);
+    public List<PostDto> getPostsByStatus(TradeStatus tradeStatus, int postType) {
+        List<Post> postList = postRepository.findByTradeStatusAndPostType(tradeStatus, postType);
+
         return postList.stream()
                 .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
-                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getPostType(), post.getContent(), post.getCreatedTime(),
                         post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
-                        post.getTradeStatus(), post.getItemCategory()))
+                        post.getTradeStatus(), post.getItemCategory(), post.getPrice(), post.getPersonCount(),
+                        post.getPersonCurrCount(), post.getDeadline()))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<PostDto> getPostsByCategory(ItemCategory itemCategory) {
-        List<Post> postsInCategory = postRepository.findByItemCategory(itemCategory);
+    public List<PostDto> getPostsByCategory(ItemCategory itemCategory, int postType) {
+        List<Post> postsInCategory = postRepository.findByItemCategoryAndPostType(itemCategory, postType);
+
         return postsInCategory.stream()
                 .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
-                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getPostType(), post.getContent(), post.getCreatedTime(),
                         post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
-                        post.getTradeStatus(), post.getItemCategory()))
+                        post.getTradeStatus(), post.getItemCategory(), post.getPrice(), post.getPersonCount(),
+                        post.getPersonCurrCount(), post.getDeadline()))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<PostDto> getPostsByArea(Area area) {
-        List<Post> postsInArea = postRepository.findByArea(area);
+    public List<PostDto> getPostsByArea(Area area, int postType) {
+        List<Post> postsInArea = postRepository.findByAreaAndPostType(area, postType);
+
         return postsInArea.stream()
                 .map(post -> new PostDto(post.getId(), post.getUser(), post.getArea(), post.getTitle(),
-                        post.getPostType(), post.getTradeArea(), post.getContent(), post.getCreatedTime(),
+                        post.getPostType(), post.getContent(), post.getCreatedTime(),
                         post.getUpdateTime(), post.getViewCount(), post.getWishlistCount(), post.getChatLink(),
-                        post.getTradeStatus(), post.getItemCategory()))
+                        post.getTradeStatus(), post.getItemCategory(), post.getPrice(), post.getPersonCount(),
+                        post.getPersonCurrCount(), post.getDeadline()))
                 .collect(Collectors.toList());
     }
 

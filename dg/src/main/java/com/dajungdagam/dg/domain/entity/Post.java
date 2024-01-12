@@ -2,7 +2,8 @@ package com.dajungdagam.dg.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.swagger.models.auth.In;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -47,11 +48,24 @@ public class Post extends BaseEntity {
     @Column(length = 50, name = "post_title", nullable = false)
     private String title;
 
+    @Column
+    @NonNull
+    private Integer price;
+
+    @Column
+    @NonNull
+    private Integer personCount;
+
+    @Column
+    @NonNull
+    private Integer personCurrCount;
+
+    @Column
+    @NonNull
+    private Date deadline;
+
     @Column(name = "post_type", nullable = false)
     private int postType;
-
-    @Column(length = 10, name = "trade_area")
-    private String tradeArea;
 
     @Column(columnDefinition = "TEXT", name = "tp_content", nullable = false)
     private String content;
@@ -77,6 +91,7 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, //orphanRemoval = true,
                 fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Image> images = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -86,17 +101,16 @@ public class Post extends BaseEntity {
 
     @Builder
     public Post(Long id, User user, Area area, String title, int postType,
-                String tradeArea, String content, LocalDateTime createdTime,
-                LocalDateTime updateTime, int viewCount, Long wishlistCount,
+                String content, LocalDateTime createdTime, LocalDateTime updateTime, int viewCount, Long wishlistCount,
                 String chatLink, TradeStatus tradeStatus, List<Image> images,
-                ItemCategory itemCategory) {
+                ItemCategory itemCategory, Integer price, Integer personCount,
+                Integer personCurrCount, Date deadline) {
 
         this.id = id;
         this.user = user;
         this.area = area;
         this.title = title;
         this.postType = postType;
-        this.tradeArea = tradeArea;
         this.content = content;
         this.createdTime = createdTime;
         this.updateTime = updateTime;
@@ -106,6 +120,10 @@ public class Post extends BaseEntity {
         this.tradeStatus = tradeStatus;
         this.images = images;
         this.itemCategory = itemCategory;
+        this.price = price;
+        this.personCount = personCount;
+        this.personCurrCount = personCurrCount;
+        this.deadline = deadline;
     }
 
 }
