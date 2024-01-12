@@ -19,6 +19,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -33,7 +34,7 @@ public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tp_id")
+    @Column(name = "post_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,11 +42,11 @@ public class Post extends BaseEntity {
 
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "area_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
-    @Column(length = 50, name = "tp_title")
+    @Column(length = 50, name = "post_title", nullable = false)
     private String title;
 
     @Column(columnDefinition = "integer default 0")
@@ -69,7 +70,7 @@ public class Post extends BaseEntity {
     @Column(length = 10, name = "trade_area")
     private String tradeArea;
 
-    @Column(columnDefinition = "TEXT", name = "tp_content")
+    @Column(columnDefinition = "TEXT", name = "tp_content", nullable = false)
     private String content;
 
     @Column(columnDefinition = "TIMESTAMP", name = "created_time")
@@ -84,11 +85,11 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "integer default 0", name = "wishlist_count")
     private Long wishlistCount;
 
-    @Column(columnDefinition = "TEXT", name = "chat_link")
+    @Column(columnDefinition = "TEXT", name = "chat_link", nullable = false)
     private String chatLink;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trade_status")
+    @Column(name = "trade_status", nullable = false)
     private TradeStatus tradeStatus;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, //orphanRemoval = true,
@@ -96,9 +97,10 @@ public class Post extends BaseEntity {
     @JsonManagedReference
     private List<Image> images = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_category_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_category_id", nullable = false)
     private ItemCategory itemCategory;
+
 
     @Builder
     public Post(Long id, User user, Area area, String title, int postType,

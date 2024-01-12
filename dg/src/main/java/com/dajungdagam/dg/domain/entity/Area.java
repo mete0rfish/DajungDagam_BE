@@ -9,12 +9,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Area {
+
     @Id
     @GeneratedValue
     @Column(name = "area_id")
-    public int id;
+
+    private int id;
+
     @Column(name = "GUNAME")
-    public String guName;
+    private String guName;
+
     @Column(name = "DONGNAME")
     public String dongName;
 }

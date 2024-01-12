@@ -2,33 +2,34 @@ package com.dajungdagam.dg.Controller;
 
 
 
-import com.dajungdagam.dg.domain.dto.PostDto;
-import com.dajungdagam.dg.domain.dto.TradePostSummaryDto;
-import com.dajungdagam.dg.domain.dto.UserResponseDto;
+import com.dajungdagam.dg.domain.dto.*;
+import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.service.UserService;
-
-import com.dajungdagam.dg.domain.entity.Image;
-import com.dajungdagam.dg.domain.entity.ItemCategory;
 
 import com.dajungdagam.dg.service.ItemCategoryService;
 import com.dajungdagam.dg.service.PostService;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpHeaders;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+
 import java.nio.charset.StandardCharsets;
+
+import java.util.HashMap;
+
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -40,29 +41,26 @@ public class TradePostController {
     @Autowired
     private UserService userService;
 
-
-
-    public TradePostController(PostService postService, ItemCategoryService itemCategoryService) {
+    public TradePostController(PostService postService, ItemCategoryService itemCategoryService,
+                               UserService userService) {
         this.postService = postService;
         this.itemCategoryService = itemCategoryService;
+        this.userService = userService;
     }
 
-    @GetMapping("/trade/")
-    public String list(Model model, @RequestParam(value = "page", defaultValue = "1") Integer pageNum) {
-        List<PostDto> postDtoList = postService.getPostlist(pageNum);
-        Integer[] pageList = postService.getPageList(pageNum);
+    @GetMapping("/trade")
+    public ResponseEntity<List<PostDto>> list() {
+        List<PostDto> postDtoList = postService.getPostlist();
 
-        model.addAttribute("PostList", postDtoList);
-        model.addAttribute("pageList", pageList);
-        return "list1";
+        return new ResponseEntity<>(postDtoList, HttpStatus.OK);
     }
 
     @GetMapping("/trade/posts")
-    public String saveForm(Model model) {
-        List<ItemCategory> categories = itemCategoryService.getAllCategories();
-        model.addAttribute("categories", categories);
+    public ResponseEntity<PostDto> saveForm() {
 
-        return "save1";
+        PostDto postDto = new PostDto();
+
+        return new ResponseEntity<>(postDto, HttpStatus.OK);
     }
 
     @GetMapping("/trade/like-posts")
@@ -80,7 +78,7 @@ public class TradePostController {
 
     @PostMapping(value = "/trade/posts")
     public ResponseEntity<String> write(PostDto postDto, Authentication authentication, @RequestPart MultipartFile[] images) throws IOException {
-        log.info("title: " + postDto.getTitle() + " , content : " + postDto.getContent());
+
         try {
             if(authentication == null)
                 throw new Exception("authentication is null. non user Info");
@@ -95,71 +93,72 @@ public class TradePostController {
             postService.savePost(postDto, images);
         }
 
-        return ResponseEntity.ok().body("dasdsada");
+        return ResponseEntity.ok().body("게시글 생성 완료");
     }
 
-    @GetMapping("/trade/posts/{id}")
-    public String detail(@PathVariable Long id, Model model) {
-        postService.updateView(id);
 
-        PostDto postDto = postService.getPost(id);
+    @GetMapping("/trade/posts/{post_id}")
+    public ResponseEntity<PostDto> detail(@PathVariable("post_id") Long post_id) {
+        postService.updateView(post_id);
+        PostDto postDto = postService.getPost(post_id);
 
-        model.addAttribute("postDto", postDto);
-
-        return "detail1";
+        return new ResponseEntity<>(postDto, HttpStatus.OK);
     }
 
-    @GetMapping("/trade/posts/update/{id}")
-    public String edit(@PathVariable Long id, Model model) {
-        PostDto postDto = postService.getPost(id);
 
-        List<Image> images = postService.getImagesByTradePost(postDto.toEntity());
 
-        model.addAttribute("postDto", postDto);
-        model.addAttribute("images", images);
+    @GetMapping("/trade/posts/update/{post_id}")
+    public ResponseEntity<TradePostSimpleDto> edit(@PathVariable("post_id") Long post_id) {
+        PostDto postDto = postService.getPost(post_id);
 
-        return "update1";
+        ModelMapper modelMapper = new ModelMapper();
+        TradePostSimpleDto tradePostSimpleDto = modelMapper.map(postDto, TradePostSimpleDto.class);
+
+        return ResponseEntity.ok(tradePostSimpleDto);
     }
 
-    @PatchMapping("/trade/posts/update/{id}")
-    public String update(@PathVariable Long id, PostDto postDto,
-                         HttpServletResponse response, @RequestParam MultipartFile[] images) throws IOException {
-        postDto.setId(id);
-        //tradePostService.updatePost(tradePostDto);
+    @PatchMapping("/trade/posts/update/{post_id}")
+    public ResponseEntity<?> update(@PathVariable("post_id") Long post_id, PostDto postDto,
+                                    @RequestPart MultipartFile[] images) {
+        postDto.setId(post_id);
         postService.updatePost(postDto);
 
-        response.setHeader(HttpHeaders.ALLOW, "GET, POST, PUT, PATCH, DELETE");
-
-        return "redirect:/";
+        return ResponseEntity.ok().body("게시글 수정 완료");
     }
 
-    @DeleteMapping("trade/posts/{id}")
-    public String delete(@PathVariable Long id) {
-        postService.deletePost(id);
 
-        return "redirect:/";
+    @DeleteMapping("trade/posts/{post_id}")
+    public ResponseEntity<?> delete(@PathVariable("post_id") Long post_id) {
+        postService.deletePost(post_id);
+
+        return ResponseEntity.ok().body("게시글 삭제 완료");
     }
-    @GetMapping("/trade/search")
-    public String search(@RequestParam String keyword, Model model) {
+
+    @GetMapping("/trade/posts/search")
+    public ResponseEntity<List<PostDto>> search(@RequestParam String keyword) {
         List<PostDto> postDtoList = postService.searchPosts(keyword);
-        model.addAttribute("TradePostList", postDtoList);
 
-        return "list1";
+        return new ResponseEntity<>(postDtoList, HttpStatus.OK);
+    }
+    
+
+    @GetMapping("/trade/posts/category/{itemCategory}")
+    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable ItemCategory itemCategory) {
+        List<PostDto> postsByCategory = postService.getPostsByCategory(itemCategory);
+        return new ResponseEntity<>(postsByCategory, HttpStatus.OK);
     }
 
 
-    @GetMapping("/trade/posts/category/{categoryId}")
-    public String getPostsByCategory(@PathVariable Long categoryId, Model model) {
-        // TradePostService에서 카테고리 조회하는 메서드 사용
-        ItemCategory category = postService.getItemCategoryById(categoryId);
+    @GetMapping("/trade/posts/status/{tradeStatus}")
+    public ResponseEntity<List<PostDto>> getPostsByStatus(@PathVariable TradeStatus tradeStatus) {
+        List<PostDto> postsByStatus = postService.getPostsByStatus(tradeStatus);
+        return new ResponseEntity<>(postsByStatus, HttpStatus.OK);
+    }
 
-        // 해당 카테고리에 속한 게시글들을 가져옴
-        List<PostDto> postsInCategory = postService.getTradePostsByCategory(category);
-
-        model.addAttribute("category", category);
-        model.addAttribute("posts", postsInCategory);
-
-        return "category1";
+    @GetMapping("/trade/posts/area/{area}")
+    public ResponseEntity<List<PostDto>> getPostsByArea(@PathVariable Area area) {
+        List<PostDto> postsByArea = postService.getPostsByArea(area);
+        return new ResponseEntity<>(postsByArea, HttpStatus.OK);
     }
 
 

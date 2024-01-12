@@ -70,6 +70,8 @@ dependencies {
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'org.apache.tika:tika-core:2.4.1'
 
+    // 모델 매퍼
+    implementation 'org.modelmapper:modelmapper:2.4.1'
 
 }
 
