@@ -6,17 +6,13 @@ import com.dajungdagam.dg.domain.dto.*;
 import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.service.UserService;
 
-import com.dajungdagam.dg.service.ItemCategoryService;
 import com.dajungdagam.dg.service.PostService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.http.HttpHeaders;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import java.nio.charset.StandardCharsets;
-
-import java.util.HashMap;
-
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
