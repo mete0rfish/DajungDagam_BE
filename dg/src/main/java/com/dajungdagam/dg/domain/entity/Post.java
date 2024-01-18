@@ -43,10 +43,10 @@ public class Post extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "area_id", nullable = false)
+    @JoinColumn(name = "area_id")
     private Area area;
 
-    @Column(length = 50, name = "post_title", nullable = false)
+    @Column(length = 50, name = "post_title")
     private String title;
 
     @Column(columnDefinition = "integer default 0")
@@ -64,13 +64,13 @@ public class Post extends BaseEntity {
     @Column
     private LocalDateTime deadline;
 
-    @Column(name = "post_type", nullable = false)
+    @Column(name = "post_type")
     private int postType;
 
     @Column(length = 10, name = "trade_area")
     private String tradeArea;
 
-    @Column(columnDefinition = "TEXT", name = "tp_content", nullable = false)
+    @Column(columnDefinition = "TEXT", name = "tp_content")
     private String content;
 
     @Column(columnDefinition = "TIMESTAMP", name = "created_time")
@@ -85,11 +85,11 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "integer default 0", name = "wishlist_count")
     private Long wishlistCount;
 
-    @Column(columnDefinition = "TEXT", name = "chat_link", nullable = false)
+    @Column(columnDefinition = "TEXT", name = "chat_link")
     private String chatLink;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trade_status", nullable = false)
+    @Column(name = "trade_status")
     private TradeStatus tradeStatus;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, //orphanRemoval = true,
@@ -98,7 +98,7 @@ public class Post extends BaseEntity {
     private List<Image> images = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "item_category_id", nullable = false)
+    @JoinColumn(name = "item_category_id")
     private ItemCategory itemCategory;
 
 
