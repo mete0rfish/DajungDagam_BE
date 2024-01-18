@@ -13,6 +13,7 @@ import java.time.*;
 @NoArgsConstructor
 public class PostDto {
 
+
     public Long id;
 
     @JsonIgnore
@@ -33,6 +34,7 @@ public class PostDto {
 
 
     public ItemCategory itemCategory;
+
 
 
     public Post toEntity() {
@@ -74,7 +76,6 @@ public class PostDto {
         this.wishlistCount = wishlistCount;
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
-        this.wishlist = wishlist;
         this.itemCategory = itemCategory;
 
     }

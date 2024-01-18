@@ -26,12 +26,12 @@ public class GroupBuyingController {
     }
 
     @GetMapping("/group-buying/")
-    public String list(Model model, @RequestParam(value = "page", defaultValue = "1") Integer pageNum) {
-        List<PostDto> postDtoList = postService.getPostlist(pageNum);
-        Integer[] pageList = postService.getPageList(pageNum);
+    public String list(Model model) {
+        List<PostDto> postDtoList = postService.getPostlist();
+        //Integer[] pageList = postService.getPageList();
 
         model.addAttribute("PostList", postDtoList);
-        model.addAttribute("pageList", pageList);
+        //model.addAttribute("pageList", pageList);
         return "list2";
     }
 
@@ -107,18 +107,18 @@ public class GroupBuyingController {
     }
 
 
-    @GetMapping("/group-buying/posts/category/{categoryId}")
-    public String getPostsByCategory(@PathVariable Long categoryId, Model model) {
-        // PostService에서 카테고리 조회하는 메서드 사용
-        ItemCategory category = postService.getItemCategoryById(categoryId);
-
-        // 해당 카테고리에 속한 게시글들을 가져옴
-        List<PostDto> postsInCategory = postService.getTradePostsByCategory(category);
-
-        model.addAttribute("category", category);
-        model.addAttribute("posts", postsInCategory);
-
-        return "category2";
-    }
+//    @GetMapping("/group-buying/posts/category/{categoryId}")
+//    public String getPostsByCategory(@PathVariable Long categoryId, Model model) {
+//        // PostService에서 카테고리 조회하는 메서드 사용
+//        ItemCategory category = postService.getItemCategoryById(categoryId);
+//
+//        // 해당 카테고리에 속한 게시글들을 가져옴
+//        List<PostDto> postsInCategory = postService.getTradePostsByCategory(category);
+//
+//        model.addAttribute("category", category);
+//        model.addAttribute("posts", postsInCategory);
+//
+//        return "category2";
+//    }
 
 }
