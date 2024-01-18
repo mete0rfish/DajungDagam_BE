@@ -1,8 +1,10 @@
 package com.dajungdagam.dg.service;
 
 import com.dajungdagam.dg.domain.dto.PostDto;
+import com.dajungdagam.dg.domain.dto.PostWriteDto;
 import com.dajungdagam.dg.domain.dto.TradePostSummaryDto;
 import com.dajungdagam.dg.domain.entity.*;
+import com.dajungdagam.dg.repository.*;
 import com.dajungdagam.dg.repository.ImageRepository;
 import com.dajungdagam.dg.repository.ItemCategoryRepository;
 import com.dajungdagam.dg.repository.PostRepository;
@@ -35,7 +37,8 @@ public class PostService {
     private PostRepository postRepository;
     private ImageRepository imageRepository;
 
-
+    private AreaJpaRepository areaJpaRepository;
+    
     private WishlistService wishlistService;
 
     private WishListJpaRepository wishlistRepository;
@@ -46,9 +49,10 @@ public class PostService {
     private static final int PAGE_POST_COUNT = 9; // 한 페이지에 존재하는 게시글 수
 
     @Autowired
-    public PostService(PostRepository postRepository, ImageRepository imageRepository, WishlistService wishlistService, WishListJpaRepository wishlistRepository, ItemCategoryRepository itemCategoryRepository) {
+    public PostService(PostRepository postRepository, AreaJpaRepository areaJpaRepository, ImageRepository imageRepository, WishlistService wishlistService, WishListJpaRepository wishlistRepository, ItemCategoryRepository itemCategoryRepository) {
         this.postRepository = postRepository;
         this.imageRepository = imageRepository;
+        this.areaJpaRepository = areaJpaRepository;
         this.wishlistService = wishlistService;
         this.wishlistRepository = wishlistRepository;
         this.itemCategoryRepository = itemCategoryRepository;
@@ -94,7 +98,7 @@ public class PostService {
     private final String imagePath = "../resources/pic";
 
     @Transactional // 게시글 작성 이미지 업로드 기능 추가
-    public void savePost(PostDto postDto, MultipartFile[] images) throws IOException {
+    public void savePost(PostWriteDto postWriteDto, MultipartFile[] images) throws IOException {
 
          Path uploadPath = Paths.get(imagePath);
 
@@ -107,10 +111,24 @@ public class PostService {
                  e.printStackTrace();
              }
          }
+        
 
          // 게시글 DB에 저장 후 pk을 받아옴
-         Long id = postRepository.save(postDto.toEntity()).getId();
-         Post post = postRepository.findById(id).get();
+         // Long id = postRepository.save(postDto.toEntity()).getId();
+         // Post post = postRepository.findById(id).get();
+        
+         // Area 엔티티 조회
+        Area area = areaJpaRepository.findByGuNameAndDongName(postWriteDto.getGuName(), postWriteDto.getDongName());
+
+        ItemCategory itemCategory = itemCategoryRepository.findByCategoryName(postWriteDto.getCategoryName());
+        
+        // Post 엔티티 생성
+        Post post = postWriteDto.toEntity(area, itemCategory);
+
+        // Post 엔티티 저장
+        Post savedPost = postRepository.save(post);
+
+        
          if (images != null && images.length > 0) {
 
              // 최소 하나의 이미지를 업로드하도록 검증

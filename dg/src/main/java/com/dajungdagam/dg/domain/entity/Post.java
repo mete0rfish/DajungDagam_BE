@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.*;
 
@@ -61,7 +62,9 @@ public class Post extends BaseEntity {
     @NonNull
     private Integer personCurrCount;
 
+    
     @Column
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime deadline;
 
     @Column(name = "post_type")
@@ -101,6 +104,8 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "item_category_id")
     private ItemCategory itemCategory;
 
+
+    
 
     @Builder
     public Post(Long id, User user, Area area, String title, int postType,

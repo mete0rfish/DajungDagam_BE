@@ -52,7 +52,7 @@ public class GroupBuyingController {
     public String write(@ModelAttribute PostDto postDto,
                         @RequestParam MultipartFile[] images) throws IOException {
 
-        postService.savePost(postDto, images);
+        // postService.savePost(postDto, images);
 
         return "redirect:/";
     }
