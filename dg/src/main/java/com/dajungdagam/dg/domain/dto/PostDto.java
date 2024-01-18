@@ -3,9 +3,11 @@ package com.dajungdagam.dg.domain.dto;
 
 import com.dajungdagam.dg.domain.entity.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.models.auth.In;
 import lombok.*;
 
 import java.time.*;
+import java.util.Date;
 
 @Getter
 @Setter // Setter랑 ToString 없으면 DB 내에 저장이 안되더라.
@@ -13,28 +15,26 @@ import java.time.*;
 @NoArgsConstructor
 public class PostDto {
 
-
-    public Long id;
+    private Long id;
 
     @JsonIgnore
-    public User user;
-    public Area area;
-    public String title;
-    public int postType;
-    public String tradeArea;
-    public String content;
-    public LocalDateTime createdTime;
-    public LocalDateTime updateTime;
-    public int viewCount;
-    public Long wishlistCount;
-    public String chatLink;
-    public TradeStatus tradeStatus;
-
-    public Wishlist wishlist;
-
-
-    public ItemCategory itemCategory;
-
+    private User user;
+    private Area area;
+    private String title;
+    private int postType;
+    private String content;
+    private LocalDateTime createdTime;
+    private LocalDateTime updateTime;
+    private int viewCount;
+    private Long wishlistCount;
+    private String chatLink;
+    private TradeStatus tradeStatus;
+    private Wishlist wishlist;
+    private ItemCategory itemCategory;
+    private Integer price;
+    private Integer personCount;
+    private Integer personCurrCount;
+    private Date deadline;
 
 
     public Post toEntity() {
@@ -44,7 +44,6 @@ public class PostDto {
                 .area(area)
                 .title(title)
                 .postType(postType)
-                .tradeArea(tradeArea)
                 .content(content)
                 .createdTime(createdTime)
                 .updateTime(updateTime)
@@ -53,14 +52,18 @@ public class PostDto {
                 .chatLink(chatLink)
                 .tradeStatus(tradeStatus)
                 .itemCategory(itemCategory)
+                .price(price)
+                .personCount(personCount)
+                .personCurrCount(personCurrCount)
+                .deadline(deadline)
                 .build();
     }
 
     @Builder
     public PostDto(Long id, User user, Area area, String title, int postType,
-                   String tradeArea, String content, LocalDateTime createdTime,
-                   LocalDateTime updateTime, int viewCount, Long wishlistCount,
-                   String chatLink, TradeStatus tradeStatus, ItemCategory itemCategory)
+                   String content, LocalDateTime createdTime, LocalDateTime updateTime, int viewCount, Long wishlistCount,
+                   String chatLink, TradeStatus tradeStatus, ItemCategory itemCategory,
+                   Integer price, Integer personCount, Integer personCurrCount, Date deadline)
 
     {
         this.id = id;
@@ -68,7 +71,6 @@ public class PostDto {
         this.area = area;
         this.title = title;
         this.postType = postType;
-        this.tradeArea = tradeArea;
         this.content = content;
         this.createdTime = createdTime;
         this.updateTime = updateTime;
@@ -77,7 +79,10 @@ public class PostDto {
         this.chatLink = chatLink;
         this.tradeStatus = tradeStatus;
         this.itemCategory = itemCategory;
-
+        this.price = price;
+        this.personCount = personCount;
+        this.personCurrCount = personCurrCount;
+        this.deadline = deadline;
     }
 
 }

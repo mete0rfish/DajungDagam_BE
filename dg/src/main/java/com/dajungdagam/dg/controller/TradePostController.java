@@ -6,17 +6,13 @@ import com.dajungdagam.dg.domain.dto.*;
 import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.service.UserService;
 
-import com.dajungdagam.dg.service.ItemCategoryService;
 import com.dajungdagam.dg.service.PostService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.http.HttpHeaders;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -24,67 +20,47 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import java.nio.charset.StandardCharsets;
-
-import java.util.HashMap;
-
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
 public class TradePostController {
 
+    @Autowired
     private PostService postService;
-    private ItemCategoryService itemCategoryService;
 
     @Autowired
     private UserService userService;
 
-    public TradePostController(PostService postService, ItemCategoryService itemCategoryService,
-                               UserService userService) {
+    public TradePostController(PostService postService, UserService userService) {
         this.postService = postService;
-        this.itemCategoryService = itemCategoryService;
         this.userService = userService;
     }
 
     @GetMapping("/trade")
     public ResponseEntity<List<PostDto>> list() {
-        List<PostDto> postDtoList = postService.getPostlist();
+        List<PostDto> postDtoList = postService.getPostlist(1);
 
         return new ResponseEntity<>(postDtoList, HttpStatus.OK);
-    }
-
-    @GetMapping("/trade/posts")
-    public ResponseEntity<PostDto> saveForm() {
-
-        PostDto postDto = new PostDto();
-
-        return new ResponseEntity<>(postDto, HttpStatus.OK);
     }
 
     @GetMapping("/trade/like-posts")
     public ResponseEntity<List<TradePostSummaryDto>> liked_list() {
 
-        List<TradePostSummaryDto> likePostsSummaryDtos = postService.getLikePosts();
+        List<TradePostSummaryDto> likePostsSummaryDtos = postService.getLikePosts(1);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-
-        return new ResponseEntity<>(likePostsSummaryDtos, headers, HttpStatus.OK);
-        //인기글 목록에는 모든 정보가 필요하지 않다. -> TradePostSummaryDto를 이용하여 반환
-        //return new TradePostSummaryDto();
+        return new ResponseEntity<>(likePostsSummaryDtos, HttpStatus.OK);
     }
 
     @PostMapping(value = "/trade/posts")
-    public ResponseEntity<String> write(@RequestPart PostDto postDto, Authentication authentication, @RequestPart(required = false) MultipartFile[] images) throws IOException {
+    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart(required = false) MultipartFile[] images) throws IOException {
 
         try {
             if(authentication == null)
                 throw new Exception("authentication is null. non user Info");
 
             log.info("게시글 작성됨");
-            log.info(postDto.toString());
+            log.info(postWriteDto.toString());
             log.info(images.toString());
             
             String kakaoName = authentication.getName();
@@ -94,7 +70,7 @@ public class TradePostController {
         }catch(Exception e){
             e.getStackTrace();
         } finally {
-            postService.savePost(postDto, images);
+            postService.savePost(postWriteDto, images);
         }
 
         return ResponseEntity.ok().body("게시글 생성 완료");
@@ -140,7 +116,7 @@ public class TradePostController {
 
     @GetMapping("/trade/posts/search")
     public ResponseEntity<List<PostDto>> search(@RequestParam String keyword) {
-        List<PostDto> postDtoList = postService.searchPosts(keyword);
+        List<PostDto> postDtoList = postService.searchPosts(keyword, 1);
 
         return new ResponseEntity<>(postDtoList, HttpStatus.OK);
     }
@@ -148,23 +124,21 @@ public class TradePostController {
 
     @GetMapping("/trade/posts/category/{itemCategory}")
     public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable ItemCategory itemCategory) {
-        List<PostDto> postsByCategory = postService.getPostsByCategory(itemCategory);
+        List<PostDto> postsByCategory = postService.getPostsByCategory(itemCategory,1);
         return new ResponseEntity<>(postsByCategory, HttpStatus.OK);
     }
 
 
     @GetMapping("/trade/posts/status/{tradeStatus}")
     public ResponseEntity<List<PostDto>> getPostsByStatus(@PathVariable TradeStatus tradeStatus) {
-        List<PostDto> postsByStatus = postService.getPostsByStatus(tradeStatus);
+        List<PostDto> postsByStatus = postService.getPostsByStatus(tradeStatus,1);
         return new ResponseEntity<>(postsByStatus, HttpStatus.OK);
     }
 
     @GetMapping("/trade/posts/area/{area}")
     public ResponseEntity<List<PostDto>> getPostsByArea(@PathVariable Area area) {
-        List<PostDto> postsByArea = postService.getPostsByArea(area);
+        List<PostDto> postsByArea = postService.getPostsByArea(area,1);
         return new ResponseEntity<>(postsByArea, HttpStatus.OK);
     }
-
-
 
 }

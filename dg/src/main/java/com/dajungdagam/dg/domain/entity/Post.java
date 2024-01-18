@@ -3,7 +3,7 @@ package com.dajungdagam.dg.domain.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import io.swagger.models.auth.In;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -39,38 +39,35 @@ public class Post extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "area_id")
+    @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
-    @Column(length = 50, name = "post_title")
+    @Column(length = 50, name = "post_title", nullable = false)
     private String title;
 
-    @Column(columnDefinition = "integer default 0")
+    @Column
     @NonNull
     private Integer price;
 
-    @Column(columnDefinition = "integer default 0")
+    @Column
     @NonNull
     private Integer personCount;
 
-    @Column(columnDefinition = "integer default 0")
+    @Column
     @NonNull
     private Integer personCurrCount;
 
     @Column
-    private LocalDateTime deadline;
+    @NonNull
+    private Date deadline;
 
-    @Column(name = "post_type")
+    @Column(name = "post_type", nullable = false)
     private int postType;
 
-    @Column(length = 10, name = "trade_area")
-    private String tradeArea;
-
-    @Column(columnDefinition = "TEXT", name = "tp_content")
+    @Column(columnDefinition = "TEXT", name = "tp_content", nullable = false)
     private String content;
 
     @Column(columnDefinition = "TIMESTAMP", name = "created_time")
@@ -85,11 +82,11 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "integer default 0", name = "wishlist_count")
     private Long wishlistCount;
 
-    @Column(columnDefinition = "TEXT", name = "chat_link")
+    @Column(columnDefinition = "TEXT", name = "chat_link", nullable = false)
     private String chatLink;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trade_status")
+    @Column(name = "trade_status", nullable = false)
     private TradeStatus tradeStatus;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, //orphanRemoval = true,
@@ -98,23 +95,22 @@ public class Post extends BaseEntity {
     private List<Image> images = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "item_category_id")
+    @JoinColumn(name = "item_category_id", nullable = false)
     private ItemCategory itemCategory;
 
 
     @Builder
     public Post(Long id, User user, Area area, String title, int postType,
-                String tradeArea, String content, LocalDateTime createdTime,
-                LocalDateTime updateTime, int viewCount, Long wishlistCount,
+                String content, LocalDateTime createdTime, LocalDateTime updateTime, int viewCount, Long wishlistCount,
                 String chatLink, TradeStatus tradeStatus, List<Image> images,
-                ItemCategory itemCategory) {
+                ItemCategory itemCategory, Integer price, Integer personCount,
+                Integer personCurrCount, Date deadline) {
 
         this.id = id;
         this.user = user;
         this.area = area;
         this.title = title;
         this.postType = postType;
-        this.tradeArea = tradeArea;
         this.content = content;
         this.createdTime = createdTime;
         this.updateTime = updateTime;
@@ -124,6 +120,10 @@ public class Post extends BaseEntity {
         this.tradeStatus = tradeStatus;
         this.images = images;
         this.itemCategory = itemCategory;
+        this.price = price;
+        this.personCount = personCount;
+        this.personCurrCount = personCurrCount;
+        this.deadline = deadline;
     }
 
 }
