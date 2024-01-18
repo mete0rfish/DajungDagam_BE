@@ -49,7 +49,7 @@ public class GroupBuyingController {
     }
 
     @PostMapping(value = "/group-buying/posts")
-    public ResponseEntity<String> write(PostDto postDto, Authentication authentication, @RequestPart MultipartFile[] images) throws IOException {
+    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart MultipartFile[] images) throws IOException {
 
         try {
             if(authentication == null)
@@ -57,12 +57,12 @@ public class GroupBuyingController {
 
             String kakaoName = authentication.getName();
             UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
-            postDto.setUser(userResponseDto.getUser());
+//            postWriteDto.setUser(userResponseDto.getUser());
 
         }catch(Exception e){
             e.getStackTrace();
         } finally {
-            postService.savePost(postDto, images);
+            postService.savePost(postWriteDto, images);
         }
 
         return ResponseEntity.ok().body("게시글 생성 완료");

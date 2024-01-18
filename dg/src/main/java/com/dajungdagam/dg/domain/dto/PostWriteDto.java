@@ -1,6 +1,7 @@
 package com.dajungdagam.dg.domain.dto;
 
 import com.dajungdagam.dg.domain.entity.*;
+import com.dajungdagam.dg.repository.AreaJpaRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -28,10 +29,26 @@ public class PostWriteDto {
     public LocalDateTime deadline;
     public String itemCategory;
 
+    public Post toEntity(AreaJpaRepository areaJpaRepository) {
+        Area area = areaJpaRepository.findByGuNameAndDongName(guName, dongName);
+
+        return Post.builder()
+                .id(id)
+                .title(title)
+                .postType(postType)
+                .content(content)
+                .createdTime(createdTime)
+                .updateTime(updatedTime)
+                .viewCount(viewCount)
+//                .wishlistCount(wishlistCount)
+                .chatLink(chatLink)
+//                .itemCategory(itemCategory)
+                .area(area)
+                .build();
+    }
 
 
     @Builder
-
     public PostWriteDto(Long id, String guName, String dongName, String title, int postType, String content, LocalDateTime createdTime, LocalDateTime updatedTime, int viewCount, Integer wishlistCount, String chatLink, LocalDateTime deadline, String itemCategory) {
         this.id = id;
         this.guName = guName;
@@ -42,9 +59,9 @@ public class PostWriteDto {
         this.createdTime = createdTime;
         this.updatedTime = updatedTime;
         this.viewCount = viewCount;
-        this.wishlistCount = wishlistCount;
+//        this.wishlistCount = wishlistCount;
         this.chatLink = chatLink;
         this.deadline = deadline;
-        this.itemCategory = itemCategory;
+//        this.itemCategory = itemCategory;
     }
 }
