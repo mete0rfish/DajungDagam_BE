@@ -35,6 +35,8 @@ public class PostService {
 
     private AreaJpaRepository areaJpaRepository;
 
+    private ItemCategoryRepository itemCategoryRepository;
+
     private WishlistService wishlistService;
 
     private WishListJpaRepository wishlistRepository;
@@ -103,21 +105,17 @@ public class PostService {
              }
          }
 
-//         // 게시글 DB에 저장 후 pk을 받아옴
-//         Long id = postRepository.save(postWriteDto.toEntity()).getId();
-//         Post post = postRepository.findById(id).get();
-
-        // Area 엔티티 조회
         Area area = areaJpaRepository.findByGuNameAndDongName(postWriteDto.getGuName(), postWriteDto.getDongName());
 
+        ItemCategory itemCategory = itemCategoryRepository.findByCategoryName(postWriteDto.getCategoryName());
+
         // Post 엔티티 생성
-        Post post = postWriteDto.toEntity(areaJpaRepository);
+        Post post = postWriteDto.toEntity(area, itemCategory);
 
         // Post 엔티티 저장
         Post savedPost = postRepository.save(post);
 
-
-         if (images != null && images.length > 0) {
+        if (images != null && images.length > 0) {
 
              // 최소 하나의 이미지를 업로드하도록 검증
              if (images.length < 1) {
@@ -163,7 +161,7 @@ public class PostService {
                              .uuid(uuid)
                              .imageType(formatType)
                              .imageSize(image.getSize())
-                             .post(post)
+                             .post(savedPost)
                              .build();
 
                      imageRepository.save(image1);

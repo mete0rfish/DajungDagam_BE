@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class PostWriteDto {
 
     public Long id;
-
     public String guName;
     public String dongName;
     public String title;
@@ -23,17 +22,16 @@ public class PostWriteDto {
     public LocalDateTime createdTime;
     public LocalDateTime updatedTime;
     public int viewCount;
-    // price
     public Integer wishlistCount;
     public String chatLink;
     public LocalDateTime deadline;
-    public String itemCategory;
+    public String categoryName;
 
-    public Post toEntity(AreaJpaRepository areaJpaRepository) {
-        Area area = areaJpaRepository.findByGuNameAndDongName(guName, dongName);
+    public Post toEntity(Area area, ItemCategory itemCategory) {
 
         return Post.builder()
-                .id(id)
+                .area(area)
+                .itemCategory(itemCategory)
                 .title(title)
                 .postType(postType)
                 .content(content)
@@ -42,14 +40,12 @@ public class PostWriteDto {
                 .viewCount(viewCount)
 //                .wishlistCount(wishlistCount)
                 .chatLink(chatLink)
-//                .itemCategory(itemCategory)
-                .area(area)
                 .build();
     }
 
 
     @Builder
-    public PostWriteDto(Long id, String guName, String dongName, String title, int postType, String content, LocalDateTime createdTime, LocalDateTime updatedTime, int viewCount, Integer wishlistCount, String chatLink, LocalDateTime deadline, String itemCategory) {
+    public PostWriteDto(Long id, String guName, String dongName, String title, int postType, String content, LocalDateTime createdTime, LocalDateTime updatedTime, int viewCount, Integer wishlistCount, String chatLink, LocalDateTime deadline, String categoryName) {
         this.id = id;
         this.guName = guName;
         this.dongName = dongName;
@@ -59,9 +55,8 @@ public class PostWriteDto {
         this.createdTime = createdTime;
         this.updatedTime = updatedTime;
         this.viewCount = viewCount;
-//        this.wishlistCount = wishlistCount;
+        this.wishlistCount = wishlistCount;
         this.chatLink = chatLink;
-        this.deadline = deadline;
-//        this.itemCategory = itemCategory;
+        this.categoryName = categoryName;
     }
 }
