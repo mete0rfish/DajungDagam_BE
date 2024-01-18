@@ -41,6 +41,8 @@ public class UserService {
     private static int userIdx = 0;
 
     public UserKakaoLoginResponseDto kakaoLogin(Map<String, Object> userInfo) {
+        boolean newUser = false;
+        
         String kakaoName = (String)userInfo.get("kakaoName");
         log.info("kakaoName: "+kakaoName);
 
@@ -50,11 +52,13 @@ public class UserService {
             // 기존에 등록된 유저가 아니면, DB에 저장 후 다시 불러오기
             signUp(userInfo);
             userResponseDto = findByUserKakaoNickName(kakaoName);
+            
+            newUser = true;
         }
 
         // JWT 토큰 발행
         String token = jwtTokenProvider.createToken(kakaoName, secretKey, expiredMs);
-        return new UserKakaoLoginResponseDto(HttpStatus.OK, token, userResponseDto.getUser());
+        return new UserKakaoLoginResponseDto(HttpStatus.OK, token, userResponseDto.getUser(), newUser);
     }
 
     public UserResponseDto findByUserKakaoNickName(String kakaoName){

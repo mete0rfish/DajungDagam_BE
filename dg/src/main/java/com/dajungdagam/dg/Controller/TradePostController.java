@@ -77,15 +77,19 @@ public class TradePostController {
     }
 
     @PostMapping(value = "/trade/posts")
-    public ResponseEntity<String> write(PostDto postDto, Authentication authentication, @RequestPart MultipartFile[] images) throws IOException {
+    public ResponseEntity<String> write(@RequestPart PostDto postDto, Authentication authentication, @RequestPart(required = false) MultipartFile[] images) throws IOException {
 
         try {
             if(authentication == null)
                 throw new Exception("authentication is null. non user Info");
 
+            log.info("게시글 작성됨");
+            log.info(postDto.toString());
+            log.info(images.toString());
+            
             String kakaoName = authentication.getName();
             UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
-            postDto.setUser(userResponseDto.getUser());
+
 
         }catch(Exception e){
             e.getStackTrace();
