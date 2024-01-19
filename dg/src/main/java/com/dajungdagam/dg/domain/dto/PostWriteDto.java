@@ -46,6 +46,7 @@ public class PostWriteDto {
                 .createdTime(createdTime)
                 .updateTime(updatedTime)
                 .viewCount(viewCount)
+                .deadline(deadline)
 //                .wishlistCount(wishlistCount)
                 .chatLink(chatLink)
                 .build();
