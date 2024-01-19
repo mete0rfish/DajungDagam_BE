@@ -42,6 +42,7 @@ public class PostWriteDto {
                 .title(title)
                 .postType(postType)
                 .content(content)
+                .deadline(deadline)
                 .createdTime(createdTime)
                 .updateTime(updatedTime)
                 .viewCount(viewCount)
