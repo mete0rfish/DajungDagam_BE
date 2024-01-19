@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import java.util.Date;
 import java.util.List;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @Getter
@@ -64,8 +65,8 @@ public class Post extends BaseEntity {
 
     
     @Column
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime deadline;
+    @JsonFormat(pattern = "yyyy-MM-dd") //데이터 포맷 변환
+    private LocalDate deadline;
 
     @Column(name = "post_type")
     private int postType;
@@ -109,17 +110,16 @@ public class Post extends BaseEntity {
 
     @Builder
     public Post(Long id, User user, Area area, String title, int postType,
-                String tradeArea, String content, LocalDateTime createdTime,
-                LocalDateTime updateTime, int viewCount, Long wishlistCount,
+                String content, LocalDateTime createdTime, LocalDateTime updateTime, int viewCount, Long wishlistCount,
                 String chatLink, TradeStatus tradeStatus, List<Image> images,
-                ItemCategory itemCategory) {
+                ItemCategory itemCategory, Integer price, Integer personCount,
+                Integer personCurrCount, LocalDate deadline) {
 
         this.id = id;
         this.user = user;
         this.area = area;
         this.title = title;
         this.postType = postType;
-        this.tradeArea = tradeArea;
         this.content = content;
         this.createdTime = createdTime;
         this.updateTime = updateTime;
@@ -129,6 +129,11 @@ public class Post extends BaseEntity {
         this.tradeStatus = tradeStatus;
         this.images = images;
         this.itemCategory = itemCategory;
+        this.price = price;
+        this.personCount = personCount;
+        this.personCurrCount = personCurrCount;
+        this.deadline = deadline;
     }
+
 
 }

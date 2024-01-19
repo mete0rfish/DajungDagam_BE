@@ -5,8 +5,10 @@ import com.dajungdagam.dg.repository.AreaJpaRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter // Setter랑 ToString 없으면 DB 내에 저장이 안되더라.
@@ -27,8 +29,8 @@ public class PostWriteDto {
     // price
     public Integer wishlistCount;
     public String chatLink;
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    public LocalDateTime deadline;
+   @JsonFormat(pattern = "yyyy-MM-dd") //데이터 포맷 변환
+    public LocalDate deadline;
     public String categoryName;
 
     
@@ -50,7 +52,7 @@ public class PostWriteDto {
 
 
     @Builder
-    public PostWriteDto(Long id, String guName, String dongName, String title, int postType, String content, LocalDateTime createdTime, LocalDateTime updatedTime, int viewCount, Integer wishlistCount, String chatLink, LocalDateTime deadline, String categoryName) {
+    public PostWriteDto(Long id, String guName, String dongName, String title, int postType, String content, LocalDateTime createdTime, LocalDateTime updatedTime, int viewCount, Integer wishlistCount, String chatLink, LocalDate deadline, String categoryName) {
         this.id = id;
         this.guName = guName;
         this.dongName = dongName;
