@@ -54,7 +54,7 @@ public class TradePostController {
     }
 
     @PostMapping(value = "/trade/posts")
-    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart(value = "file", required = false) MultipartFile[] file) throws IOException {
+    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart(value = "files", required = false) List<MultipartFile> file) throws IOException {
     
         UserResponseDto userResponseDto = null;
         

@@ -49,8 +49,8 @@ public class GroupBuyingController {
         return new ResponseEntity<>(likePostsSummaryDtos, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/group-buying/posts")
-    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart(value = "file", required = false) MultipartFile[] file) throws IOException {
+    @PostMapping(value = "/group-buying/posts", consumes = "multipart/form-data")
+    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart(value = "files", required = false) List<MultipartFile> files) throws IOException {
     UserResponseDto userResponseDto = null;
         
         try {
@@ -65,7 +65,8 @@ public class GroupBuyingController {
               assert userResponseDto != null;
             log.info(userResponseDto.toString());
             
-            log.info(Integer.toString(file.length));
+            if(files.isEmpty())    log.error("이미지 파일 null");
+          
 //            postWriteDto.setUser(userResponseDto.getUser());
 
         }catch(Exception e){
@@ -74,7 +75,7 @@ public class GroupBuyingController {
             log.info("finally");
             assert userResponseDto != null;
             log.info(userResponseDto.toString());
-            postService.savePost(postWriteDto, file, userResponseDto);
+            postService.savePost(postWriteDto, files, userResponseDto);
         }
 
         return ResponseEntity.ok().body("게시글 생성 완료");

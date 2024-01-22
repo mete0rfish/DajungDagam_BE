@@ -93,7 +93,7 @@ public class PostService {
     private final String imagePath = "../resources/pic";
 
     @Transactional // 게시글 작성 이미지 업로드 기능 추가
-    public void savePost(PostWriteDto postWriteDto, MultipartFile[] images, UserResponseDto userResponseDto) throws IOException {
+    public void savePost(PostWriteDto postWriteDto, List<MultipartFile> images, UserResponseDto userResponseDto) throws IOException {
 
          Path uploadPath = Paths.get(imagePath);
 
@@ -121,14 +121,14 @@ public class PostService {
         
 
         
-        if (images != null && images.length > 0) {
+        if (!images.isEmpty() && images.size() >0) {
 
              // 최소 하나의 이미지를 업로드하도록 검증
-             if (images.length < 1) {
+             if (images.size() < 1) {
                  throw new IllegalArgumentException("최소 하나의 이미지를 업로드해야 합니다.");
              }
              // 최대 5개의 이미지만 업로드하도록 검증
-             if (images.length > 5) {
+             if (images.size() > 5) {
                  throw new IllegalArgumentException("최대 5개의 이미지만 업로드할 수 있습니다.");
              }
 
