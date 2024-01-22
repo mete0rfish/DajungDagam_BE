@@ -3,6 +3,7 @@ package com.dajungdagam.dg.service;
 import com.dajungdagam.dg.domain.dto.PostDto;
 import com.dajungdagam.dg.domain.dto.PostWriteDto;
 import com.dajungdagam.dg.domain.dto.TradePostSummaryDto;
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -92,7 +93,7 @@ public class PostService {
     private final String imagePath = "../resources/pic";
 
     @Transactional // 게시글 작성 이미지 업로드 기능 추가
-    public void savePost(PostWriteDto postWriteDto, MultipartFile[] images) throws IOException {
+    public void savePost(PostWriteDto postWriteDto, MultipartFile[] images, UserResponseDto userResponseDto) throws IOException {
 
          Path uploadPath = Paths.get(imagePath);
 
@@ -112,10 +113,14 @@ public class PostService {
 
         // Post 엔티티 생성
         Post post = postWriteDto.toEntity(area, itemCategory);
+        post.setUser(userResponseDto.getUser());
 
         // Post 엔티티 저장
         Post savedPost = postRepository.save(post);
+        
+        
 
+        
         if (images != null && images.length > 0) {
 
              // 최소 하나의 이미지를 업로드하도록 검증
@@ -169,7 +174,9 @@ public class PostService {
 
                  }
              }
-         }
+         } else {
+            log.error("이미지가 없습니다.");
+        }
 
      }
 
@@ -205,6 +212,10 @@ public class PostService {
                     .chatLink(post.getChatLink())
                     .tradeStatus(post.getTradeStatus())
                     .itemCategory(post.getItemCategory())
+                .price(post.getPrice())
+                    .personCount(post.getPersonCount())
+                    .personCurrCount(post.getPersonCurrCount())
+                    .deadline(post.getDeadline())
                     .build();
             postDtoList.add(postDto);
         }
@@ -349,6 +360,8 @@ public class PostService {
                     .wishlistCount(likePost.getWishlistCount())
                     .tradeStatus(likePost.getTradeStatus())
                     .postType(likePost.getPostType())
+                .personCount(likePost.getPersonCount())
+                    .personCurrCount(likePost.getPersonCurrCount())
                     .build();
             summaryDtos.add(tradePostSummaryDto);
         }

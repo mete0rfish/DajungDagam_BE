@@ -4,6 +4,7 @@ import com.dajungdagam.dg.domain.dto.*;
 import com.dajungdagam.dg.domain.entity.Area;
 import com.dajungdagam.dg.domain.entity.ItemCategory;
 import com.dajungdagam.dg.domain.entity.TradeStatus;
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.service.PostService;
 import com.dajungdagam.dg.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,20 +50,31 @@ public class GroupBuyingController {
     }
 
     @PostMapping(value = "/group-buying/posts")
-    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart MultipartFile[] images) throws IOException {
-
+    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart(value = "file", required = false) MultipartFile[] file) throws IOException {
+    UserResponseDto userResponseDto = null;
+        
         try {
             if(authentication == null)
                 throw new Exception("authentication is null. non user Info");
 
             String kakaoName = authentication.getName();
-            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+            userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+            if(userResponseDto == null)    throw new Exception("userResponseDto is null");
+            
+             log.info("try");
+              assert userResponseDto != null;
+            log.info(userResponseDto.toString());
+            
+            log.info(Integer.toString(file.length));
 //            postWriteDto.setUser(userResponseDto.getUser());
 
         }catch(Exception e){
             e.getStackTrace();
         } finally {
-            postService.savePost(postWriteDto, images);
+            log.info("finally");
+            assert userResponseDto != null;
+            log.info(userResponseDto.toString());
+            postService.savePost(postWriteDto, file, userResponseDto);
         }
 
         return ResponseEntity.ok().body("게시글 생성 완료");

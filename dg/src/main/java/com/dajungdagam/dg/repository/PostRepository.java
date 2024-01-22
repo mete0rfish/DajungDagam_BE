@@ -21,7 +21,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAllByUserId(int userId);
 
-    @Query("SELECT p FROM Post p WHERE p.postType = :postType ORDER BY p.wishlistCount DESC")
+    @Query("SELECT p FROM Post p WHERE p.postType = :postType ORDER BY p.wishlistCount DESC LIMIT 3")
     List<Post> findTop3ByOrderByWishlistCountDesc(@Param("postType") int postType);
 
     @Modifying // 조회수 구현

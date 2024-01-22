@@ -3,6 +3,7 @@ package com.dajungdagam.dg.domain.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.dajungdagam.dg.domain.entity.Recommendation;
 
 import java.util.List;
 
@@ -11,12 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 public class RecommendOutputDto {
 
-    private int userId;
+    private int user_id;
 
-    private List<String> postTitles;
+    private List<Recommendation> recommendations;
 
-    public RecommendOutputDto(int userId, List<String> postTitles) {
-        this.userId = userId;
-        this.postTitles = postTitles;
+    public RecommendOutputDto(int user_id, List<Recommendation> recommendations) {
+        this.user_id = user_id;
+        this.recommendations = recommendations;
     }
 }

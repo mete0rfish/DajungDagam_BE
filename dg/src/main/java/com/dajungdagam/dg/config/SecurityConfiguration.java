@@ -62,6 +62,10 @@ public class SecurityConfiguration {
     // JWT 토큰 사용 시 설정
     @Bean
     public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("https://localhost:3000");
+        
         return httpSecurity
                 .httpBasic().disable()
                 .csrf().disable()
@@ -71,6 +75,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/login/logout/**").permitAll() // login은 전체 허용
                 .requestMatchers("/h2-console/**").permitAll() // h2-console은 전체 허용
                 .requestMatchers("/trade/**").permitAll() // h2-console은 전체 허용
+                .requestMatchers("/group-buying/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/mypage/**").authenticated() // mypage는 인증하도록 설정
                 .and()
                 .sessionManagement()

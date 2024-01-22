@@ -21,11 +21,11 @@ public class TradePostSummaryDto {
     private Long wishlistCount;
     private TradeStatus tradeStatus;
     private int postType;
+    private Integer personCount;
+    private Integer personCurrCount;
 
     @Builder
-    public TradePostSummaryDto(Long id, User user, String title, String tradeArea,
-                               String content, int viewCount, Long wishlistCount,
-                               TradeStatus tradeStatus, int postType) {
+   public TradePostSummaryDto(Long id, User user, String title, String tradeArea, String content, int viewCount, Long wishlistCount, TradeStatus tradeStatus, Integer personCount, Integer personCurrCount, int postType) {
         this.id = id;
         this.user = user;
         this.title = title;
@@ -34,6 +34,8 @@ public class TradePostSummaryDto {
         this.viewCount = viewCount;
         this.wishlistCount = wishlistCount;
         this.tradeStatus = tradeStatus;
+        this.personCount = personCount;
+        this.personCurrCount = personCurrCount;
         this.postType = postType;
     }
 }

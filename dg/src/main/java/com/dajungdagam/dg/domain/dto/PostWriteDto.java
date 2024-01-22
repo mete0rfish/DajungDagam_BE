@@ -32,6 +32,9 @@ public class PostWriteDto {
    @JsonFormat(pattern = "yyyy-MM-dd") //데이터 포맷 변환
     public LocalDate deadline;
     public String categoryName;
+    public Integer price;
+    public Integer personCount;
+    public Integer personCurrCount;
 
     
     public Post toEntity(Area area, ItemCategory itemCategory) {
@@ -49,12 +52,15 @@ public class PostWriteDto {
                 .deadline(deadline)
 //                .wishlistCount(wishlistCount)
                 .chatLink(chatLink)
+                .price(price)
+                .personCount(personCount)
+                .personCurrCount(personCurrCount)
                 .build();
     }
 
 
     @Builder
-    public PostWriteDto(Long id, String guName, String dongName, String title, int postType, String content, LocalDateTime createdTime, LocalDateTime updatedTime, int viewCount, Integer wishlistCount, String chatLink, LocalDate deadline, String categoryName) {
+    public PostWriteDto(Long id, String guName, String dongName, String title, int postType, String content, LocalDateTime createdTime, LocalDateTime updatedTime, int viewCount, Integer wishlistCount, String chatLink, LocalDate deadline, String categoryName, Integer price, Integer personCount, Integer personCurrCount) {
         this.id = id;
         this.guName = guName;
         this.dongName = dongName;
@@ -66,6 +72,10 @@ public class PostWriteDto {
         this.viewCount = viewCount;
         this.wishlistCount = wishlistCount;
         this.chatLink = chatLink;
+        this.deadline = deadline;
         this.categoryName = categoryName;
+        this.price = price;
+        this.personCount = personCount;
+        this.personCurrCount = personCurrCount;
     }
 }

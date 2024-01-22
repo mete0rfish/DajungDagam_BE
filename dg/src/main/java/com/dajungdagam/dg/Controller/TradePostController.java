@@ -3,6 +3,7 @@ package com.dajungdagam.dg.Controller;
 
 
 import com.dajungdagam.dg.domain.dto.*;
+import com.dajungdagam.dg.domain.dto.UserResponseDto;
 import com.dajungdagam.dg.domain.entity.*;
 import com.dajungdagam.dg.service.UserService;
 
@@ -53,24 +54,26 @@ public class TradePostController {
     }
 
     @PostMapping(value = "/trade/posts")
-    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart(required = false) MultipartFile[] images) throws IOException {
-
+    public ResponseEntity<String> write(@RequestPart PostWriteDto postWriteDto, Authentication authentication, @RequestPart(value = "file", required = false) MultipartFile[] file) throws IOException {
+    
+        UserResponseDto userResponseDto = null;
+        
         try {
             if(authentication == null)
                 throw new Exception("authentication is null. non user Info");
 
             log.info("게시글 작성됨");
             log.info(postWriteDto.toString());
-            log.info(images.toString());
+            log.info(file.toString());
             
             String kakaoName = authentication.getName();
-            UserResponseDto userResponseDto = userService.findByUserKakaoNickName(kakaoName);
+            userResponseDto = userService.findByUserKakaoNickName(kakaoName);
 
 
         }catch(Exception e){
             e.getStackTrace();
         } finally {
-            postService.savePost(postWriteDto, images);
+            postService.savePost(postWriteDto, file, userResponseDto);
         }
 
         return ResponseEntity.ok().body("게시글 생성 완료");

@@ -49,7 +49,7 @@ public class WishlistController {
             RecommendOutputDto recommendOutputDto = wishlistService.addPostToWishlist(wishlistDto);
             if(recommendOutputDto == null)  throw new Exception("FastAPI 서버로 데이터 요청 실패");
 
-            System.out.println(recommendOutputDto.getPostTitles());
+            System.out.println(recommendOutputDto.getRecommendations());
 
             return ResponseEntity.ok().body(recommendOutputDto);
         } catch(Exception e){
